@@ -91,8 +91,8 @@
                   backup_stack_address = architecture.memory_layout[4].value;
                   backup_data_address  = architecture.memory_layout[3].value;
 
-                  uielto_preload_architecture.data.architecture_name = ename;
-                  app._data.architecture_name = ename; //TODO: bidirectional
+                  uielto_preload_architecture.data.architecture_name = architecture.arch_conf[0].value;
+                  app._data.architecture_name = architecture.arch_conf[0].value; //TODO: bidirectional
 
                   if (load_associated_examples && typeof e.examples !== "undefined"){
                     uielto_preload_architecture.methods.load_examples_available();
@@ -119,7 +119,12 @@
                     $.getJSON('examples/example_set.json' + "?v=" + new Date().getTime(), function(set) {
 
                       // current architecture in upperCase
-                      var current_architecture = uielto_preload_architecture.data.architecture_name.toUpperCase() ;
+                      if (typeof uielto_preload_architecture.data.architecture_name === 'undefined'){
+                        var current_architecture = architecture.arch_conf[0].value.toUpperCase() ;
+                      }
+                      else{
+                        var current_architecture = uielto_preload_architecture.data.architecture_name.toUpperCase() ;
+                      }
 
                       // search for architecture name in the example set 'set'
                       for (var i=0; i<set.length; i++)
