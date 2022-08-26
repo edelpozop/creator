@@ -117,10 +117,10 @@
 
           <!-- Configuration modal -->
           <form-configuration id="configuration"
-                              :instructions_packed="instructionsPacked" 
+                              :instructions_packed="instructions_packed" 
                               :autoscroll="autoscroll"
                               :instruction_help_size="instruction_help_size"
-                              :notification_time="notificationTime" 
+                              :notification_time="notification_time" 
                               :dark="dark" 
                               :c_debug="c_debug">
           </form-configuration>
@@ -202,7 +202,7 @@
 
               <!-- Delete architecture modal -->
               <delete-architecture  id="modalDeletArch"
-                                    :index="modalDeletArchIndex">                      
+                                    :index="modal_delete_arch_index">                      
               </delete-architecture>
 
               <!-- Backup modal -->
@@ -257,16 +257,16 @@
 
                         <!-- Edit Architecture configuration -->
                         <arch-conf-edit id="edit_arch_field"
-                                        :title="modalEditArchField.title"
-                                        :arch_field="modalEditArchField.field"
-                                        :arch_field_value="modalEditArchField.value"
-                                        :arch_field_index="modalEditArchField.index">
+                                        :title="modal_edit_arch_field.title"
+                                        :arch_field="modal_edit_arch_field.field"
+                                        :arch_field_value="modal_edit_arch_field.value"
+                                        :arch_field_index="modal_edit_arch_field.index">
                         </arch-conf-edit>
 
                         <!-- Reset Architecture configuration -->
                         <arch-conf-reset  id="reset_arch_field"
-                                          :title="modalResetArchField.title"
-                                          :arch_field_index="modalResetArchField.index"
+                                          :title="modal_reset_arch_field.title"
+                                          :arch_field_index="modal_reset_arch_field.index"
                                           :architecture_name="architecture_name">
                         </arch-conf-reset>
 
@@ -282,7 +282,7 @@
 
                         <!-- Edit memory layout -->
                         <memory-layout-edit id="change_memory_layout"
-                                            :memory_layout="modalEditMemoryLayout.memory_layout">
+                                            :memory_layout="modal_edit_memory_layout.memory_layout">
                         </memory-layout-edit>
 
                         <!-- Reset memory layout -->
@@ -310,15 +310,15 @@
 
                         <!-- Register File edit form-->
                         <register-file-edit id="edit_register_file"
-                                            :title="modalEditComponent.title"
-                                            :element="modalEditComponent.element"
-                                            :name="modalEditComponent.name">
+                                            :title="modal_edit_register_file.title"
+                                            :name="modal_edit_register_file.name"
+                                            :index="modal_edit_register_file.index">
                         </register-file-edit>
 
                         <!-- Delete Register File -->
                         <register-file-delete id="delete_register_file"
-                                              :title="modalDeletComp.title"
-                                              :element="modalDeletComp.element">
+                                              :title="modal_delete_register_file.title"
+                                              :index="modal_delete_register_file.index">
                         </register-file-delete>
 
 
@@ -326,33 +326,37 @@
 
                         <!-- New register -->
                         <registers-new id="new_register"
-                                      :element="modalNewElement.element"
-                                      :type="modalNewElement.type"
-                                      :double_precision="modalNewElement.double_precision"
-                                      :reg_id="modalNewElement.id"
-                                      :simple_reg="simple_reg"
-                                      :bits="architecture.arch_conf.bits">
+                                      :register_file_index="modal_new_register.register_file_index"
+                                      :type="modal_new_register.type"
+                                      :double_precision="modal_new_register.double_precision"
+                                      :reg_id="modal_new_register.id"
+                                      :simple_reg="modal_new_register.simple_reg">
+                                      
                         </registers-new>
 
                         <!-- Edit register -->
                         <registers-edit id="edit_register"
-                                        :element="modalEditElement.element"
-                                        :type="modalEditElement.type"
-                                        :double_precision="modalEditElement.double_precision"
-                                        :reg_id="modalEditElement.reg_id"
-                                        :name="modalEditElement.name"
-                                        :def_value="modalEditElement.defValue"
-                                        :properties="modalEditElement.properties"
-                                        :precision="modalEditElement.precision"
-                                        :simple_reg="simple_reg"
-                                        :simple_1="modalEditElement.simple1"
-                                        :simple_2="modalEditElement.simple2">
+                                        :title="modal_edit_register.title"
+                                        :register_file_index="modal_edit_register.register_file_index"
+                                        :register_index="modal_edit_register.register_index"
+                                        :name="modal_edit_register.name"
+                                        :type="modal_edit_register.type"
+                                        :double_precision="modal_edit_register.double_precision"
+                                        :reg_id="modal_edit_register.reg_id"
+                                        :name="modal_edit_register.name"
+                                        :default_value="modal_edit_register.default_value"
+                                        :properties="modal_edit_register.properties"
+                                        :precision="modal_edit_register.precision"
+                                        :simple_reg="modal_edit_register.simple_reg"
+                                        :simple_1="modal_edit_register.simple1"
+                                        :simple_2="modal_edit_register.simple2">
                         </registers-edit>
 
                         <!-- Delete register -->
                         <registers-delete  id="delete_register"
-                                          :title="modalDeletElement.title"
-                                          :element="modalDeletElement.element">
+                                          :title="modal_delete_register.title"
+                                          :register_file_index="modal_delete_register.register_file_index"
+                                          :register_index="modal_delete_register.register_index">
                         </registers-delete>
 
                       </b-tab>
