@@ -88,7 +88,6 @@
 
                            //Close all toast and refresh
                           app.$bvToast.hide()
-                          app.$forceUpdate();
                         }
                       },
 
@@ -102,17 +101,6 @@
 
                         //Close all toast and refresh
                         app.$bvToast.hide()
-                        app.$forceUpdate();
-                      },
-
-                      //
-                      // Architecture
-                      //
-
-                      //Change advanced mode
-                      change_advanced_mode()
-                      {
-                        app._data.advanced_mode = !app._data.advanced_mode
                       },
 
                       //
@@ -442,7 +430,6 @@
                               button_assembly() +
                               button_simulator() +
                               button_save_architecture() +
-                              button_advanced_mode() +
                               dropdown_assembly_file() +
                               button_compile() +
                               dropdown_library() +
@@ -506,21 +493,6 @@
             '</b-button>'
   }
 
-  function button_advanced_mode(){
-    return  '<div class="buttons" v-if="item==\'btn_advanced_mode\'" @click="change_advanced_mode">' +
-            '  <b-button class="btn btn-outline-secondary btn-block menuGroup btn-sm h-100"' +
-            '            id="advanced_mode1" ' +
-            '            v-if="app._data.advanced_mode == true">' +
-            '    Advanced Mode: deactivated' +
-            '  </b-button>' +
-            '  <b-button class="btn btn-outline-secondary btn-block menuGroup btn-sm h-100"  ' +
-            '            id="advanced_mode2" ' +
-            '            v-if="app._data.advanced_mode == false">' +
-            '    Advanced Mode: activate' +
-            '  </b-button>' +
-            '</div>'
-  }
-
   function dropdown_assembly_file(){
     return  '<b-dropdown v-if="item==\'dropdown_assembly_file\'" right ' +
             '            text="File" ' +
@@ -547,7 +519,7 @@
   }
 
   function button_compile(){
-    return  '<b-button v-if="item==\'btn_compile\'" class="btn btn-block btn-outline-secondary menuGroup btn-sm h-100" ' +
+    return  '<b-button v-if="item==\'btn_compile\'" class="btn btn-block btn-outline-secondary actionsGroup btn-sm h-100" ' +
             '          id="compile_assembly" ' +
             '          @click="assembly_compiler()">' +
             '  <span class="fas fa-sign-in-alt"></span>' +
