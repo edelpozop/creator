@@ -121,7 +121,21 @@
                       } 
                       break;
 
-                    case "decimal":
+                    case "ieee32":
+                      if (architecture.components[this._props.component.index].type == "control" || architecture.components[this._props.component.index].type == "integer") {
+                        ret = hex2float("0x"+(((register.value).toString(16)).padStart(register.nbits/4, "0")));
+                      }
+                      else {
+                        if (architecture.components[this._props.component.index].double_precision == false) {
+                          ret = bi_BigIntTofloat(register.value);
+                        }
+                        else{
+                          ret = bi_BigIntTodouble(register.value);
+                        }
+                      }
+                      break;
+
+                    case "ieee64":
                       if (architecture.components[this._props.component.index].type == "control" || architecture.components[this._props.component.index].type == "integer") {
                         ret = hex2float("0x"+(((register.value).toString(16)).padStart(register.nbits/4, "0")));
                       }
@@ -142,6 +156,17 @@
                   
                 },
 
+
+
+
+
+
+
+
+
+
+
+
                 //Update a new register value
                 update_register(comp, elem, type, precision){
                   for (var i = 0; i < architecture.components[comp].elements.length; i++) {
@@ -151,43 +176,37 @@
                         if(value[1].length * 4 > architecture.components[comp].elements[i].nbits){
                           value[1] = value[1].substring(((value[1].length * 4) - architecture.components[comp].elements[i].nbits)/4, value[1].length)
                         }
-                        architecture.components[comp].elements[i].value = bi_intToBigInt(value[1], 16);
+                        writeRegister(parseInt(value[1], 16), comp, i);
                       }
                       else if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^(\d)+/)){
-                        architecture.components[comp].elements[i].value = bi_intToBigInt(this.newValue,10);
+                        writeRegister(parseInt(this.newValue,10), comp, i);
                       }
                       else if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^-/)){
-                        architecture.components[comp].elements[i].value = bi_intToBigInt(this.newValue,10);
+                        writeRegister(parseInt(this.newValue,10), comp, i);
                       }
                     }
                     else if(type =="floating point"){
                       if(precision == false){
                         if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^0x/)){
-                          architecture.components[comp].elements[i].value = bi_floatToBigInt(hex2float(this.newValue));
-                          updateDouble(comp, i);
+                          writeRegister(hex2float(this.newValue), comp, i);
                         }
                         else if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^(\d)+/)){
-                          architecture.components[comp].elements[i].value = bi_floatToBigInt(parseFloat(this.newValue, 10));
-                          updateDouble(comp, i);
+                          writeRegister(parseFloat(this.newValue, 10), comp, i);
                         }
                         else if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^-/)){
-                          architecture.components[comp].elements[i].value = bi_floatToBigInt(parseFloat(this.newValue, 10));
-                          updateDouble(comp, i);
+                          writeRegister(parseFloat(this.newValue, 10), comp, i);
                         }
                       }
 
                       else if(precision == true){
                         if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^0x/)){
-                          architecture.components[comp].elements[i].value = bi_floatToBigInt(hex2double(this.newValue));
-                          updateSimple(comp, i);
+                          writeRegister(hex2double(this.newValue), comp, i);
                         }
                         else if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^(\d)+/)){
-                          architecture.components[comp].elements[i].value = bi_floatToBigInt(parseFloat(this.newValue, 10));
-                          updateSimple(comp, i);
+                          writeRegister(parseFloat(this.newValue, 10), comp, i);
                         }
                         else if(architecture.components[comp].elements[i].name == elem && this.newValue.match(/^-/)){
-                          architecture.components[comp].elements[i].value = bi_floatToBigInt(parseFloat(this.newValue, 10));
-                          updateSimple(comp, i)
+                          writeRegister(parseFloat(this.newValue, 10), comp, i);
                         }
                       }
                     }
@@ -198,6 +217,11 @@
                   creator_ga('data', 'data.change', 'data.change.register_value');
                   creator_ga('data', 'data.change', 'data.change.register_value_' + elem);
                 },
+
+
+
+
+
 
                 //Stop user interface refresh
                 debounce: _.debounce(function (param, e) {
@@ -260,7 +284,7 @@ template:     '<b-popover :target="target" ' +
               '          </b-badge>' +
               '        </td>' +
               '      </tr>' +
-              '      <tr>' +
+              '      <tr v-if="architecture.components[component.index].type != \'floating point\'">' +
               '        <td>Signed</td>' +
               '        <td>' +
               '          <b-badge class="registerPopover">' +
@@ -268,7 +292,7 @@ template:     '<b-popover :target="target" ' +
               '          </b-badge>' +
               '        </td>' +
               '      </tr>' +
-              '      <tr>' +
+              '      <tr v-if="architecture.components[component.index].type != \'floating point\'">' +
               '        <td>Unsig.</td>' +
               '        <td>' +
               '          <b-badge class="registerPopover">' +
@@ -276,7 +300,7 @@ template:     '<b-popover :target="target" ' +
               '          </b-badge>' +
               '        </td>' +
               '      </tr>' +
-              '      <tr>' +
+              '      <tr v-if="architecture.components[component.index].type != \'floating point\'">' +
               '        <td>Char</td>' +
               '        <td>' +
               '          <b-badge class="registerPopover">' +
@@ -285,13 +309,23 @@ template:     '<b-popover :target="target" ' +
               '        </td>' +
               '      </tr>' +
               '      <tr>' +
-              '        <td>IEEE 754</td>' +
+              '        <td>IEEE 754 (32 bits)</td>' +
               '        <td>' +
               '          <b-badge class="registerPopover">' +
-              '            {{show_value(register, \'decimal\')}}' +
+              '            {{show_value(register, \'ieee32\')}}' +
               '          </b-badge>' +
               '        </td>' +
               '      </tr>' +
+
+              '      <tr v-if="component.double_precision_type != \'linked\'">' +
+              '        <td>IEEE 754 (64 bits)</td>' +
+              '        <td>' +
+              '          <b-badge class="registerPopover">' +
+              '            {{show_value(register, \'ieee64\')}}' +
+              '          </b-badge>' +
+              '        </td>' +
+              '      </tr>' +
+
               '    </tbody>' +
               '  </table>' +
               '' +
