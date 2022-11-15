@@ -22,7 +22,7 @@
     },
     {
       "name": "Passing Convention",
-      "value": "0"
+      "value": "1"
     },
     {
       "name": "Sensitive Register Name",
@@ -177,7 +177,8 @@
             "read",
             "write",
             "pointer",
-            "frame"
+            "frame",
+            "saved"
           ]
         },
         {
@@ -190,7 +191,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -307,7 +309,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -320,7 +323,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -333,7 +337,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -346,7 +351,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -359,7 +365,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -372,7 +379,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -385,7 +393,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -398,7 +407,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -411,7 +421,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -424,7 +435,8 @@
           "default_value": 0,
           "properties": [
             "read",
-            "write"
+            "write",
+            "saved"
           ]
         },
         {
@@ -1016,7 +1028,7 @@
           "stopbit": 7
         }
       ],
-      "definition": "rd = PC;\n PC = inm;\n capi_drawstack_begin(inm);",
+      "definition": "rd = PC;\n PC = inm;\n capi_callconv_begin(inm); capi_drawstack_begin(inm);",
       "separated": [
         false,
         false,
@@ -1070,7 +1082,7 @@
           "valueField": "000"
         }
       ],
-      "definition": "rd = PC;\n PC = (rs1+inm)&~1;\n capi_drawstack_end(PC);",
+      "definition": "rd = PC;\n PC = (rs1+inm)&~1;\n capi_callconv_end(); capi_drawstack_end(PC);",
       "separated": [
         false,
         false,
@@ -1469,7 +1481,7 @@
           "valueField": "000"
         }
       ],
-      "definition": "rd = capi_mem_read(inm+rs1, 'b');",
+      "definition": "rd = capi_mem_read(inm+rs1, 'b');\n capi_callconv_memAction('read', inm+rs1, rd_name, 'b');",
       "separated": [
         false,
         false,
@@ -1521,7 +1533,7 @@
           "valueField": "001"
         }
       ],
-      "definition": "rd = capi_mem_read(inm+rs1, 'h');",
+      "definition": "rd = capi_mem_read(inm+rs1, 'h');\n capi_callconv_memAction('read', inm+rs1, rd_name, 'h');",
       "separated": [
         false,
         false,
@@ -1573,7 +1585,7 @@
           "valueField": "010"
         }
       ],
-      "definition": "var addr = capi_int2uint(rs1)+inm;\n rd = capi_mem_read(addr, 'w');",
+      "definition": "var addr = capi_int2uint(rs1)+inm;\n rd = capi_mem_read(addr, 'w');\n capi_callconv_memAction('read', addr, rd_name, 'w');",
       "separated": [
         false,
         false,
@@ -1625,7 +1637,7 @@
           "valueField": "101"
         }
       ],
-      "definition": "var addr = capi_int2uint(rs1)+inm;\n rd = capi_mem_read(addr, 'hu');\n rd = capi_int2uint(rd);",
+      "definition": "var addr = capi_int2uint(rs1)+inm;\n rd = capi_mem_read(addr, 'hu');\n rd = capi_int2uint(rd);\n capi_callconv_memAction('read', addr, rd_name, 'h');",
       "separated": [
         false,
         false,
@@ -1677,7 +1689,7 @@
           "valueField": "100"
         }
       ],
-      "definition": "var addr = capi_int2uint(rs1)+inm;\n rd = capi_mem_read(addr, 'bu');\n rd = capi_int2uint(rd);",
+      "definition": "var addr = capi_int2uint(rs1)+inm;\n rd = capi_mem_read(addr, 'bu');\n rd = capi_int2uint(rd);\n capi_callconv_memAction('read', addr, rd_name, 'b');",
       "separated": [
         false,
         false,
@@ -1735,7 +1747,7 @@
           "valueField": "000"
         }
       ],
-      "definition": "capi_mem_write(rs1+inm, rs2, 'b');",
+      "definition": "capi_mem_write(rs1+inm, rs2, 'b');\n capi_callconv_memAction('write', rs1+inm, rs2_name, 'b');",
       "separated": [
         false,
         true,
@@ -1793,7 +1805,7 @@
           "valueField": "001"
         }
       ],
-      "definition": "rd = capi_mem_write(inm+rs1, rs2, 'h');",
+      "definition": "rd = capi_mem_write(inm+rs1, rs2, 'h');\n capi_callconv_memAction('write', rs1+inm, rs2_name, 'h');",
       "separated": [
         false,
         true,
@@ -1851,7 +1863,7 @@
           "valueField": "010"
         }
       ],
-      "definition": "rd = capi_mem_write(inm+rs1, rs2, 'w');",
+      "definition": "rd = capi_mem_write(inm+rs1, rs2, 'w');\n capi_callconv_memAction('write', inm+rs1, rs2_name, 'w');",
       "separated": [
         false,
         true,
@@ -2982,7 +2994,7 @@
           "stopbit": 0
         }
       ],
-      "definition": "var val = capi_split_double(ft, 0);\n capi_mem_write(base+off, val, 'w');\n val = capi_split_double(ft, 1);\n capi_mem_write(base+off+4, val, 'w');",
+      "definition": "var val = capi_split_double(ft, 0);\n capi_mem_write(base+off, val, 'w');\n val = capi_split_double(ft, 1);\n capi_mem_write(base+off+4, val, 'w');\n capi_callconv_memAction('write', base+off, ft_name, 'd');",
       "separated": [
         false,
         true,
@@ -3514,7 +3526,7 @@
           "stopbit": 7
         }
       ],
-      "definition": "rd = capi_mem_read(rs2+inm, 'w');\n rd = capi_uint2float32(rd);\n",
+      "definition": "rd = capi_mem_read(rs2+inm, 'w');\n rd = capi_uint2float32(rd);\n capi_callconv_memAction('read', rs2+inm, rd_name, 'w');",
       "separated": [
         false,
         false,
@@ -3573,7 +3585,7 @@
           "valueField": "010"
         }
       ],
-      "definition": "var val1 = capi_float322uint(rs1);\n capi_mem_write(rs2+inm, val1, 'w');\n",
+      "definition": "var val1 = capi_float322uint(rs1);\n capi_mem_write(rs2+inm, val1, 'w');\n capi_callconv_memAction('write', rs2+inm, rs1_name, 'w');",
       "separated": [
         false,
         true,
@@ -5000,7 +5012,7 @@
           "stopbit": 7
         }
       ],
-      "definition": " var isnotalign = capi_bad_align(rs1+inm, 'd');\n if (isnotalign) { capi_raise('The memory must be align'); }\n var val1 = capi_mem_read(rs1+inm, 'w');\n var val2 = capi_mem_read(rs1+inm+4, 'w');\n var buf = new ArrayBuffer(8);\n var arr = (new Uint32Array(buf));\n arr[1] = val1;\n arr[0] = val2;\n rd = (new Float64Array(buf))[0];\n",
+      "definition": " var isnotalign = capi_bad_align(rs1+inm, 'd');\n if (isnotalign) { capi_raise('The memory must be align'); }\n var val1 = capi_mem_read(rs1+inm, 'w');\n var val2 = capi_mem_read(rs1+inm+4, 'w');\n var buf = new ArrayBuffer(8);\n var arr = (new Uint32Array(buf));\n arr[1] = val1;\n arr[0] = val2;\n rd = (new Float64Array(buf))[0];\n capi_callconv_memAction('write', rs1+inm, rd_name, 'd');",
       "separated": [
         false,
         false,
