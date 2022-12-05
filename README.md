@@ -22,6 +22,7 @@
 ### :mag_right:	 Checks:
 
 [![Build Status](https://travis-ci.com/dcamarmas/creator.svg?branch=master)](https://travis-ci.com/dcamarmas/creator)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/955898f8f5184938947c8b7fda7e1315)](https://www.codacy.com/gh/dcamarmas/creator/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dcamarmas/creator&amp;utm_campaign=Badge_Grade)
 [![Generic badge](https://img.shields.io/badge/achecker-WCAG%202.0%20(Level%20AAA)-green.svg)](https://shields.io/)
 
 ### :microscope:	 Nightly build:
@@ -114,4 +115,12 @@
      * Preload example 'e3' from example set 'uc3m-ec':
        * https://creatorsim.github.io/creator/?example_set=uc3m-ec&example=e3
 - [x] Bootstrap-vue upgraded up to v2.15.0
+
+
+## Supported Internet Browser
+
+![Edge](https://img.shields.io/badge/Edge-0078D7?style=for-the-badge&logo=Microsoft-edge&logoColor=white)
+![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=Firefox-Browser&logoColor=white)
+![Google Chrome](https://img.shields.io/badge/Google%20Chrome-4285F4?style=for-the-badge&logo=GoogleChrome&logoColor=white)
+![Safari](https://img.shields.io/badge/Safari-000000?style=for-the-badge&logo=Safari&logoColor=white)
 
