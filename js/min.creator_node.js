@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Alejandro Calderon Mateos, Diego Camarmas Alonso
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Alejandro Calderon Mateos, Diego Camarmas Alonso
  *
  *  This file is part of CREATOR.
  *
@@ -146,7 +146,7 @@ function register_value_serialize( architecture )
   return aux_architecture;
 }
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -189,7 +189,7 @@ function register_value_serialize( architecture )
   }
 
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -491,7 +491,7 @@ function register_value_serialize( architecture )
   }
 
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -993,7 +993,7 @@ function creator_callstack_do_transition ( doAction, indexComponent, indexElemen
 }
 
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -1065,15 +1065,24 @@ function capi_mem_write ( addr, value, type )
 	if (capi_bad_align(addr, type))
 	{
 		capi_raise("The memory must be align") ;
-		return;
+		creator_executor_exit( true );
 	}
 
-	// 2) write into memory
+	// 2) check address is into text segment
+	var addr_16 = parseInt(addr, 16);
+	if((addr_16 >= parseInt(architecture.memory_layout[0].value)) && (addr_16 <= parseInt(architecture.memory_layout[1].value)))
+    {
+        capi_raise('Segmentation fault. You tried to write in the text segment');
+        creator_executor_exit( true );
+    }
+
+	// 3) write into memory
 	try {
 		writeMemory(value, addr, type);
 	} 
 	catch(e) {
 		capi_raise("Invalid memory access to address '0x" + addr.toString(16) + "'") ;
+		creator_executor_exit( true );
 	}
 }
 
@@ -1091,8 +1100,8 @@ function capi_mem_read ( addr, type )
 	// 1) check address is aligned
 	if (capi_bad_align(addr, type))
 	{
-	capi_raise("The memory must be align") ;
-		return val;
+		capi_raise("The memory must be align") ;
+		creator_executor_exit( true );
 	}
 
 	// 2) check address is into text segment
@@ -1100,7 +1109,7 @@ function capi_mem_read ( addr, type )
 	if((addr_16 >= parseInt(architecture.memory_layout[0].value)) && (addr_16 <= parseInt(architecture.memory_layout[1].value)))
     {
         capi_raise('Segmentation fault. You tried to read in the text segment');
-        creator_executor_exit();
+        creator_executor_exit( true );
     }
 
 	// 3) read from memory
@@ -1109,8 +1118,7 @@ function capi_mem_read ( addr, type )
 	} 
 	catch(e) {
 	   capi_raise("Invalid memory access to address '0x" + addr.toString(16) + "'") ;
-	   creator_executor_exit();
-	   return val;
+	   creator_executor_exit( true );
 	}
 
 	// 4) return value
@@ -1128,7 +1136,7 @@ function capi_exit ( )
 	/* Google Analytics */
 	creator_ga('execute', 'execute.syscall', 'execute.syscall.exit');
 
-	return creator_executor_exit() ;
+	return creator_executor_exit( false ) ;
 }
 
 function capi_print_int ( value1 )
@@ -1318,7 +1326,7 @@ function capi_read_string ( value1, value2 )
 	}
 
 	/* Read string */
-        if (typeof document != "undefined") {
+	if (typeof document != "undefined") {
 	    document.getElementById('enter_keyboard').scrollIntoView();
 	}
 
@@ -1527,21 +1535,8 @@ function capi_check_ieee ( s, e, m )
 function capi_float2bin ( f )
 {
 	return float2bin(f) ;
-}
-
-
-/*
- *  CREATOR instruction description API:
- *  Expr
- */
-
-function capi_eval ( expr )
-{
-	eval(crex_replace_magic(expr)) ;
-}
-
-/*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+}/*
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -1803,7 +1798,7 @@ function track_stack_reset()
 }
 
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -2086,7 +2081,7 @@ function updateSimple ( comp, elem )
     }
   }
 }/*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -2912,7 +2907,7 @@ function creator_memory_storestring ( string, string_length, data_address, label
 }
 
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -6583,7 +6578,7 @@ function binaryStringToInt( b ) {
 }
 
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *
@@ -7037,13 +7032,19 @@ function executeProgramOneShot ( limit_n_instructions )
   return packExecute(true, '"ERROR:" number of instruction limit reached :-(', null, null) ;
 }
 
-function creator_executor_exit ( )
+function creator_executor_exit ( error )
 {
   // Google Analytics
   creator_ga('execute', 'execute.exit');
 
-  // execution_index = -1; // REASON: line 360 said that if execution_index == -1 then throw error... :-(
-  execution_index = instructions.length + 1;
+  if (error)
+  {
+    execution_index = -1;
+  }
+  else
+  {
+    execution_index = instructions.length + 1;
+  }
 }
 
 function reset ()
@@ -7122,68 +7123,6 @@ function crex_show_notification ( msg, level )
   if (typeof window !== "undefined")
     show_notification(msg, level);
   else console.log(level.toUpperCase() + ": " + msg);
-}
-
-function crex_replace_magic ( auxDef )
-{
-  // Before replace...
-  console_log("Before replace: \n" + auxDef + "\n");
-
-  // Write in memory
-  var index = 0;
-  re = /MP.([whbd]).\[(.*?)\] *=/;
-  while (auxDef.search(re) != -1)
-  {
-    index++;
-    var match = re.exec(auxDef);
-    var auxDir;
-    //eval("auxDir="+match[2]);
-
-    re = /MP.[whbd].\[(.*?)\] *=/;
-    auxDef = auxDef.replace(re, "dir" + index + "=");
-    auxDef = "var dir" + index + " = null;\n" + auxDef;
-
-    auxDef = auxDef + "\n writeMemory(dir" + index +","+match[2]+",'"+match[1]+"');";
-    re = /MP.([whb]).\[(.*?)\] *=/;
-  }
-
-  re = new RegExp("MP.([whbd]).(.*?) *=");
-  while (auxDef.search(re) != -1)
-  {
-    index++;
-    var match = re.exec(auxDef);
-    re = new RegExp("MP."+match[1]+"."+match[2]+" *=");
-    auxDef = auxDef.replace(re, "dir" + index + " =");
-    auxDef = "var dir" + index + " = null;\n" + auxDef;
-
-    auxDef = auxDef + "\n writeMemory(dir" + index +","+match[2]+",'"+match[1]+"');";
-    re = new RegExp("MP.([whbd]).(.*?) *=");
-  }
-
-  re = /MP.([whbd]).\[(.*?)\]/;
-  while (auxDef.search(re) != -1)
-  {
-    var match = re.exec(auxDef);
-    var auxDir;
-    //eval("auxDir="+match[2]);
-    re = /MP.[whbd].\[(.*?)\]/;
-    auxDef = auxDef.replace(re, "readMemory("+match[2]+", '"+match[1]+"')");
-    re = /MP.([whbd]).\[(.*?)\]/;
-  }
-
-  re = new RegExp("MP.([whbd]).([0-9]*[a-z]*[0-9]*)");
-  while (auxDef.search(re) != -1)
-  {
-    var match = re.exec(auxDef);
-    re = new RegExp("MP."+match[1]+"."+match[2]);
-    auxDef = auxDef.replace(re, "readMemory("+match[2]+",'"+match[1]+"')");
-    re = new RegExp("MP.([whb]).([0-9]*[a-z]*[0-9]*)");
-  }
-
-  // After replace...
-  console_log("After replace: \n" + auxDef + "\n");
-
-  return auxDef ;
 }
 
 // Modify the stack limit
@@ -7377,13 +7316,11 @@ function kbd_read_double ( keystroke, params )
 function kbd_read_string ( keystroke, params )
 {
   var value = "";
-  //var neltos = architecture.components[params.indexComp2].elements[params.indexElem2].value ; //TODO
   var neltos = readRegister ( params.indexComp2, params.indexElem2 );
   for (var i = 0; (i < neltos) && (i < keystroke.length); i++) {
     value = value + keystroke.charAt(i);
   }
 
-  //var addr = architecture.components[params.indexComp].elements[params.indexElem].value ; //TODO
   var neltos = readRegister ( params.indexComp, params.indexElem );
   writeMemory(value, parseInt(neltos), "string") ;
 
@@ -7614,7 +7551,7 @@ function execute_binary ( index, instructionExecParts, auxDef )
 }
 
 /*
- *  Copyright 2018-2022 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
+ *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
  *

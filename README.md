@@ -21,8 +21,8 @@
 
 ### :mag_right:	 Checks:
 
-[![Build Status](https://travis-ci.com/dcamarmas/creator.svg?branch=master)](https://travis-ci.com/dcamarmas/creator)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/955898f8f5184938947c8b7fda7e1315)](https://www.codacy.com/gh/dcamarmas/creator/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dcamarmas/creator&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.com/dcamarmas/creator.svg?branch=master)](https://travis-ci.com/github/dcamarmas/creator)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/84668451decf487bbc85b13129f0ebb5)](https://www.codacy.com/gh/creatorsim/creator/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=creatorsim/creator&amp;utm_campaign=Badge_Grade)
 [![Generic badge](https://img.shields.io/badge/achecker-WCAG%202.0%20(Level%20AAA)-green.svg)](https://shields.io/)
 
 ### :microscope:	 Nightly build:
@@ -37,37 +37,36 @@
 
 #### :point_right:	 RISC-V
 
-| Description                | Link                                                                                         |
-|----------------------------|----------------------------------------------------------------------------------------------| 
-| Data Storage               | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e1   |
-| ALU operations             | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e2   |
-| Store/Load Data in Memory  | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e3   |
-| FPU operations             | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e4   |
-| Loop                       | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e5   |
-| Branch                     | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e6   |
-| Loop + Memory              | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e7   |
-| Copy of matrices           | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e8   |
-| I/O Syscalls               | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e9   |
-| I/O Syscalls + Strings     | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e10  |
-| Subrutines                 | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e11  |
-| Factorial                  | https://dcamarmas.github.io/creator/?architecture=RISC-V&example_set=default_rv&example=e12  |
+| Description                | Link                                                                                                    |
+|----------------------------|---------------------------------------------------------------------------------------------------------| 
+| ALU operations             | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e2   |
+| Store/Load Data in Memory  | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e3   |
+| FPU operations             | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e4   |
+| Loop                       | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e5   |
+| Branch                     | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e6   |
+| Loop + Memory              | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e7   |
+| Copy of matrices           | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e8   |
+| I/O Syscalls               | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e9   |
+| I/O Syscalls + Strings     | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e10  |
+| Subrutines                 | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e11  |
+| Factorial                  | https://creatorsim.github.io/creator/?architecture=RISC-V%20(RV32IMFD)&example_set=default&example=e12  |
 
 #### :point_right:	 MIPS
 
-| Description                | Link                                                                                       |
-|----------------------------|--------------------------------------------------------------------------------------------|
-| Data Storage               | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e1   |
-| ALU operations             | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e2   |
-| Store/Load Data in Memory  | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e3   |
-| FPU operations             | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e4   |
-| Loop                       | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e5   |
-| Branch                     | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e6   |
-| Loop + Memory              | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e7   |
-| Copy of matrices           | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e8   |
-| I/O Syscalls               | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e9   |
-| I/O Syscalls + Strings     | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e10  |
-| Subrutines                 | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e11  |
-| Factorial                  | https://dcamarmas.github.io/creator/?architecture=MIPS-32&example_set=default&example=e12  |
+| Description                | Link                                                                                        |
+|----------------------------|---------------------------------------------------------------------------------------------|
+| Data Storage               | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e1   |
+| ALU operations             | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e2   |
+| Store/Load Data in Memory  | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e3   |
+| FPU operations             | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e4   |
+| Loop                       | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e5   |
+| Branch                     | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e6   |
+| Loop + Memory              | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e7   |
+| Copy of matrices           | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e8   |
+| I/O Syscalls               | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e9   |
+| I/O Syscalls + Strings     | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e10  |
+| Subrutines                 | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e11  |
+| Factorial                  | https://creatorsim.github.io/creator/?architecture=MIPS-32&example_set=default&example=e12  |
 
 
 ## ChangeLog
