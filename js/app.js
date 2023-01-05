@@ -299,17 +299,7 @@ try
       //Data view
       //
 
-      data_mode: 'registers',
-
-
-      //
-      //Registers
-      //
-
-      register_type: 'integer',
-      name_reg: 'INT Registers',
-      reg_type: 'int',
-
+      data_mode: 'int_registers',
 
       //
       //Memory

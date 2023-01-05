@@ -129,19 +129,19 @@ var load_binary = false;
 var totalStats = 0;
 var stats_value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 var stats = [
-  { type: 'Arithmetic integer', number_instructions: 0, percentage: 0 },
-  { type: 'Arithmetic floating point', number_instructions: 0, percentage: 0},
-  { type: 'Logic', number_instructions: 0, percentage: 0, abbreviation: "Log" },
-  { type: 'Transfer between registers', number_instructions: 0, percentage: 0},
-  { type: 'Memory access', number_instructions: 0, percentage: 0},
-  { type: 'Comparison', number_instructions: 0, percentage: 0},
-  { type: 'I/O', number_instructions: 0, percentage: 0},
-  { type: 'Syscall', number_instructions: 0, percentage: 0},
+  { type: 'Arithmetic floating point', number_instructions: 0, percentage: 0 },
+  { type: 'Arithmetic integer', number_instructions: 0, percentage: 0},
+  { type: 'Comparison', number_instructions: 0, percentage: 0 },
+  { type: 'Conditional bifurcation', number_instructions: 0, percentage: 0},
   { type: 'Control', number_instructions: 0, percentage: 0},
   { type: 'Function call', number_instructions: 0, percentage: 0},
-  { type: 'Conditional bifurcation', number_instructions: 0, percentage: 0},
-  { type: 'Unconditional bifurcation', number_instructions: 0, percentage: 0},
+  { type: 'I/O', number_instructions: 0, percentage: 0},
+  { type: 'Logic', number_instructions: 0, percentage: 0, abbreviation: "Log"},
+  { type: 'Memory access', number_instructions: 0, percentage: 0},
   { type: 'Other', number_instructions: 0, percentage: 0},
+  { type: 'Syscall', number_instructions: 0, percentage: 0},
+  { type: 'Transfer between registers', number_instructions: 0, percentage: 0},
+  { type: 'Unconditional bifurcation', number_instructions: 0, percentage: 0},
 ];
 /*Power consumption*/
 var total_power_consumption = 0;
@@ -151,19 +151,19 @@ var power_consumption_value = [
                                 }
                               ];
 var power_consumption = [
-  { type: 'Arithmetic integer', power_consumption: 0, percentage: 0 },
-  { type: 'Arithmetic floating point', power_consumption: 0, percentage: 0},
-  { type: 'Logic', power_consumption: 0, percentage: 0, abbreviation: "Log" },
-  { type: 'Transfer between registers', power_consumption: 0, percentage: 0},
-  { type: 'Memory access', power_consumption: 0, percentage: 0},
-  { type: 'Comparison', power_consumption: 0, percentage: 0},
-  { type: 'I/O', power_consumption: 0, percentage: 0},
-  { type: 'Syscall', power_consumption: 0, percentage: 0},
+  { type: 'Arithmetic floating point', power_consumption: 0, percentage: 0 },
+  { type: 'Arithmetic integer', power_consumption: 0, percentage: 0},
+  { type: 'Comparison', power_consumption: 0, percentage: 0 },
+  { type: 'Conditional bifurcation', power_consumption: 0, percentage: 0},
   { type: 'Control', power_consumption: 0, percentage: 0},
   { type: 'Function call', power_consumption: 0, percentage: 0},
-  { type: 'Conditional bifurcation', power_consumption: 0, percentage: 0},
-  { type: 'Unconditional bifurcation', power_consumption: 0, percentage: 0},
+  { type: 'I/O', power_consumption: 0, percentage: 0},
+  { type: 'Logic', power_consumption: 0, percentage: 0, abbreviation: "Log"},
+  { type: 'Memory access', power_consumption: 0, percentage: 0},
   { type: 'Other', power_consumption: 0, percentage: 0},
+  { type: 'Syscall', power_consumption: 0, percentage: 0},
+  { type: 'Transfer between registers', power_consumption: 0, percentage: 0},
+  { type: 'Unconditional bifurcation', power_consumption: 0, percentage: 0},
 ];
 /*Keyboard*/
 var keyboard = '' ;
@@ -2350,7 +2350,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
               if(architecture.instructions[i].fields[a].name == signatureRawParts[j]){
                 for(var z = 0; z < architecture_hash.length; z++){
                   for(var w = 0; w < architecture.components[z].elements.length; w++){
-                    if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "integer"){ //TODO:check
+                    if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "int_registers"){ //TODO:check
                       validReg = true;
                       regNum++;
 
@@ -2401,7 +2401,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                   if (architecture.components[z].double_precision_type == "linked")
                   {
                     for(var w = 0; w < architecture.components[z].elements.length; w++){
-                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "floating point" && architecture.components[z].double_precision == false){ //TODO:check
+                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == false){ //TODO:check
                         validReg = true;
                         regNum++;
 
@@ -2423,14 +2423,14 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       else if(z == architecture_hash.length-1 && w == architecture.components[z].elements.length-1 && validReg == false){
                         return packCompileError('m4', token, 'error', "danger") ;
                       }
-                      if(architecture.components[z].type == "floating point" && architecture.components[z].double_precision == false){
+                      if(architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == false){
                         regNum++;
                       }
                     }
                   }
                   else{
                     for(var w = 0; w < architecture.components[z].elements.length; w++){
-                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "floating point"){ //TODO:check
+                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "fp_registers"){ //TODO:check
                         validReg = true;
                         regNum++;
 
@@ -2452,7 +2452,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       else if(z == architecture_hash.length-1 && w == architecture.components[z].elements.length-1 && validReg == false){
                         return packCompileError('m4', token, 'error', "danger") ;
                       }
-                      if(architecture.components[z].type == "floating point" && architecture.components[z].double_precision == false){
+                      if(architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == false){
                         regNum++;
                       }
                     }
@@ -2477,7 +2477,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                   if (architecture.components[z].double_precision_type == "linked")
                   {
                     for(var w = 0; w < architecture.components[z].elements.length; w++){
-                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "floating point" && architecture.components[z].double_precision == true){ //TODO:check
+                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == true){ //TODO:check
                         validReg = true;
                         regNum++;
 
@@ -2497,14 +2497,14 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       else if(z == architecture_hash.length-1 && w == architecture.components[z].elements.length-1 && validReg == false){
                         return packCompileError('m4', token, 'error', "danger") ;
                       }
-                      if(architecture.components[z].type == "floating point" && architecture.components[z].double_precision == true){
+                      if(architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == true){
                         regNum++;
                       }
                     }
                   }
                   else{
                     for(var w = 0; w < architecture.components[z].elements.length; w++){
-                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "floating point"){ //TODO:check
+                      if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "fp_registers"){ //TODO:check
                         validReg = true;
                         regNum++;
 
@@ -2524,7 +2524,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       else if(z == architecture_hash.length-1 && w == architecture.components[z].elements.length-1 && validReg == false){
                         return packCompileError('m4', token, 'error', "danger") ;
                       }
-                      if(architecture.components[z].type == "floating point" && architecture.components[z].double_precision == true){
+                      if(architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == true){
                         regNum++;
                       }
                     }
@@ -2547,7 +2547,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
               if(architecture.instructions[i].fields[a].name == signatureRawParts[j]){
                 for(var z = 0; z < architecture_hash.length; z++){
                   for(var w = 0; w < architecture.components[z].elements.length; w++){
-                    if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "control"){ //TODO: check
+                    if(architecture.components[z].elements[w].name.includes(token) != false && architecture.components[z].type == "ctr_registers"){ //TODO: check
                       validReg = true;
                       regNum++;
 
@@ -2567,7 +2567,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     else if(z == architecture_hash.length-1 && w == architecture.components[z].elements.length-1 && validReg == false){
                       return packCompileError('m4', token, 'error', "danger") ;
                     }
-                    if(architecture.components[z].type == "control"){
+                    if(architecture.components[z].type == "ctr_registers"){
                       regNum++;
                     }
                   }

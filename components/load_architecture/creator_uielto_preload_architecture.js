@@ -77,6 +77,13 @@
                   {
                     show_loading();
 
+                    if (e == null) 
+                    {
+                      hide_loading();
+                      show_notification('The architecture is not currently available', 'info');
+                      return;
+                    }
+
                     //Read architecture JSON
                     for (i = 0; i < load_architectures.length; i++)
                     {
@@ -152,7 +159,7 @@
 
                     //Refresh UI
                     uielto_toolbar_btngroup.methods.change_UI_mode('simulator');
-                    uielto_data_view_selector.methods.change_data_view('registers', 'int');
+                    uielto_data_view_selector.methods.change_data_view('int_registers');
                     app._data.render++; //Forces vue to reload a component, similar to $forceUpdate()
                   },
 

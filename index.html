@@ -5,6 +5,37 @@
   <head>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
+    <!-- Google tag (gtag.js) - creatorsim -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X30SC9SWE2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-X30SC9SWE2');
+    </script>
+
+    <!-- Google tag (gtag.js) - dcamarmas -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6HB0QEXMQV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6HB0QEXMQV');
+    </script>
+
+    <!-- Google tag (gtag.js) - acaldero -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NS7QV51JB2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NS7QV51JB2');
+    </script>
+
+    <!-- Google tag (gtag.js) - Universal analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-186823627-2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -603,8 +634,7 @@
                   <b-col lg="5" cols="12">
 
                     <!-- View selector -->
-                    <data-view-selector :name_reg="name_reg" 
-                                        :reg_type="reg_type" 
+                    <data-view-selector :data_mode="data_mode"
                                         :register_file_num="architecture.components.length"> 
                     </data-view-selector>
 
@@ -613,8 +643,7 @@
                     <register-file  id="register_file"
                                     :render="render"
                                     :data_mode="data_mode"
-                                    :register_type="register_type"
-                                    v-if="data_mode == 'registers'">                  
+                                    v-if="data_mode == 'int_registers' ||  data_mode == 'fp_registers'">                  
                     </register-file>
 
 
