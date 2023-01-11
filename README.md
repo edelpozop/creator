@@ -6,7 +6,7 @@
 
 ## CREATOR project
 
-[![Build Status](https://travis-ci.com/dcamarmas/creator.svg?branch=master)](https://travis-ci.com/github/dcamarmas/creator)
+[![Build Status](https://app.travis-ci.com/creatorsim/creator.svg?branch=master)](https://app.travis-ci.com/creatorsim/creator)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/84668451decf487bbc85b13129f0ebb5)](https://www.codacy.com/gh/creatorsim/creator/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=creatorsim/creator&amp;utm_campaign=Badge_Grade)
 [![Generic badge](https://img.shields.io/badge/achecker-WCAG%202.0%20(Level%20AAA)-green.svg)](https://shields.io/)
 
@@ -21,38 +21,8 @@
 
 ## Examples included in CREATOR
 
-#### :point_right:	 RISC-V
-
-| Description                | Link                                                                                   |
-|:--------------------------:|:--------------------------------------------------------------------------------------:| 
-| ALU operations             | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e2   |
-| Store/Load Data in Memory  | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e3   |
-| FPU operations             | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e4   |
-| Loop                       | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e5   |
-| Branch                     | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e6   |
-| Loop + Memory              | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e7   |
-| Copy of matrices           | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e8   |
-| I/O Syscalls               | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e9   |
-| I/O Syscalls + Strings     | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e10  |
-| Subrutines                 | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e11  |
-| Factorial                  | https://creatorsim.github.io/creator/?architecture=rv&example_set=default&example=e12  |
-
-#### :point_right:	 MIPS
-
-| Description                | Link                                                                                        |
-|:--------------------------:|:-------------------------------------------------------------------------------------------:|
-| Data Storage               | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e1    |
-| ALU operations             | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e2    |
-| Store/Load Data in Memory  | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e3    |
-| FPU operations             | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e4    |
-| Loop                       | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e5    |
-| Branch                     | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e6    |
-| Loop + Memory              | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e7    |
-| Copy of matrices           | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e8    |
-| I/O Syscalls               | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e9    |
-| I/O Syscalls + Strings     | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e10   |
-| Subrutines                 | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e11   |
-| Factorial                  | https://creatorsim.github.io/creator/?architecture=mips32&example_set=default&example=e12   |
+#### :point_right: [RISC-V](docs/examples.md#point_right---risc-v) 
+#### :point_right: [MIPS-32](docs/examples.md#point_right---mips) 
 
 
 ## Supported Internet Browser
