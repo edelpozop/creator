@@ -2157,13 +2157,13 @@ var word_size_bytes = word_size_bits / 8 ;
 
 var main_memory = [] ;
     //  [
-    //    { addr: address, bin: "00", def_bin: "00", tag: null, data_type: ref <main_memory_datatypes>, reset: true, break: false },
+    //    addr: { addr: addr, bin: "00", def_bin: "00", tag: null, data_type: ref <main_memory_datatypes>, reset: true, break: false },
     //    ...
     //  ]
 
 var main_memory_datatypes = {} ;
     //  {
-    //    { "type": type, "address": addr, "value": value, "default": "00", "size": 0 },
+    //    addr: { address: addr, "type": type, "address": addr, "value": value, "default": "00", "size": 0 },
     //    ...
     //  }
 
@@ -2205,13 +2205,15 @@ function main_memory_datatype_get_addresses ( )
 
 function main_memory_packs_forav ( addr, value )
 {
-        return { addr: addr,
-                 bin: value,  
+        return {
+                 addr: addr,
+                 bin: value,
                  def_bin: "00",
                  tag: null,
                  data_type: null,
-                 reset: true, 
-                 break: false } ;
+                 reset: true,
+                 break: false
+               } ;
 }
 
 function main_memory_datatypes_packs_foravt ( addr, value, type, size )
@@ -2223,11 +2225,12 @@ function main_memory_datatypes_packs_foravt ( addr, value, type, size )
     default_value = main_memory_datatypes[addr].default_value;
   }
 
-  return { address: addr,
-           value: value, 
+  return {
+           address: addr,
+           value: value,
            default: default_value,
            type: type,
-           size: size 
+           size: size
          } ;
 }
 
@@ -2281,6 +2284,14 @@ function main_memory_zerofill ( addr, size )
              main_memory_write(addr+i, value) ;
         }
 }
+
+function main_memory_update_associated_datatype ( addr, value, datatype )
+{
+        var value = main_memory_read(addr) ;
+        value.main_memory_datatypes = datatype ;
+        main_memory[addr] = value ;
+}
+
 
 //// Read/write (2/3): byte level (execution)
 
@@ -2358,53 +2369,110 @@ function main_memory_read_bydatatype ( addr, type )
 
         switch (type)
         {
-                case 'b':
-                case 'bu':
-                case 'byte':
-                     ret = "0x" + main_memory_read_value(addr) ;
-                     break;
+          case 'b':
+          case 'bu':
+          case 'byte':
+               ret = "0x" + main_memory_read_value(addr) ;
+               ret = parseInt(ret, 16) ;
+               break;
 
-                case 'h':
-                case 'hu':
-                case 'half_word':
-                     ret = "0x" + main_memory_read_nbytes(addr, word_size_bytes/2) ;
-                     break;
+          case 'h':
+          case 'hu':
+          case 'half':
+          case 'half_word':
+               ret = "0x" + main_memory_read_nbytes(addr, word_size_bytes/2) ;
+               ret = parseInt(ret, 16) ;
+               break;
 
-                case 'w':
-                case 'integer':
-                case 'float':
-                case 'word':
-                     ret = "0x" + main_memory_read_nbytes(addr, word_size_bytes) ;
-                     break;
+          case 'w':
+          case 'integer':
+          case 'word':
+               ret = "0x" + main_memory_read_nbytes(addr, word_size_bytes) ;
+               ret = parseInt(ret, 16) ;
+               break;
 
-                case 'd':
-                case 'double':
-                case 'double_word':
-                     ret = "0x" + main_memory_read_nbytes(addr, word_size_bytes*2) ;
-                     break;
+          case 'float':
+               ret = "0x" + main_memory_read_nbytes(addr, word_size_bytes) ;
+               ret = hex2float(ret) ;
+               break;
 
-                case 'asciiz':
-                case 'string':
-                case 'ascii_null_end':
-                     ret = create_memory_read_string(addr) ;
-                     break;
+          case 'd':
+          case 'double':
+          case 'double_word':
+               ret = "0x" + main_memory_read_nbytes(addr, word_size_bytes*2) ;
+               ret = hex2double(ret) ;
+               break;
 
-                case 'ascii':
-                case 'ascii_not_null_end':
-                     // TODO
-                     break;
+          case 'c':
+          case 'cu':
+          case 'char':
+               ch = main_memory_read_value(addr) ;
+               ret = String.fromCharCode(parseInt(ch, 16));
+               break;
 
-                case 'space':
-                     // TODO
-                     break;
+          case 'asciiz':
+          case 'string':
+          case 'ascii_null_end':
+               ret = create_memory_read_string(addr) ;
+               break;
 
-                case 'instruction':
-                     // TODO
-                     break;
+          case 'ascii':
+          case 'ascii_not_null_end':
+               // TODO
+               break;
+
+          case 'space':
+               // TODO
+               break;
         }
 
         return ret ;
 }
+
+function main_memory_datatypes_update ( addr )
+{
+        var data = main_memory_read(addr) ;
+        var data_type = data.data_type ;
+        if (data_type != null)
+        {
+            var new_value   = main_memory_read_bydatatype(addr, data_type.type) ;
+            data_type.value = new_value ;
+            return true ;
+        }
+
+        return false ;
+}
+
+function main_memory_datatypes_update_or_create ( addr, value_human, size, type )
+{
+        var addr_i ;
+
+        // get main-memory entry for the associated byte at addr
+        var data = main_memory_read(addr) ;
+
+        // get associated datatype to this main-memory entry
+        var data_type = data.data_type ;
+
+        // if not associated datatype, make on... otherwise update it
+        if (data_type == null) {
+            data_type = main_memory_datatypes_packs_foravt(addr, value_human, type, size) ;
+            main_memory_datatypes[addr] = data_type ;
+        }
+        else {
+            var new_value   = main_memory_read_bydatatype(data_type.address, data_type.type) ;
+            data_type.value = new_value ;
+        }
+
+        // update main-memory referencies...
+        var data = null ;
+        for (var i=0; i<size; i++)
+        {
+             data = main_memory_read(addr + i) ;
+             data.data_type = data_type ;
+             main_memory_write(addr + i, data) ;
+        }
+}
+
 
 function main_memory_write_bydatatype ( addr, value, type, value_human )
 {
@@ -2419,7 +2487,7 @@ function main_memory_write_bydatatype ( addr, value, type, value_human )
                      size = 1 ;
                      var value2 = creator_memory_value_by_type(value, type) ;
                      ret = main_memory_write_nbytes(addr, value2, size, type) ;
-                     main_memory_datatypes_update(addr, value_human, size, type);
+                     main_memory_datatypes_update_or_create(addr, value_human, size, type);
                      break;
 
                 case 'h':
@@ -2428,7 +2496,7 @@ function main_memory_write_bydatatype ( addr, value, type, value_human )
                      size = word_size_bytes / 2 ;
                      var value2 = creator_memory_value_by_type(value, type) ;
                      ret = main_memory_write_nbytes(addr, value2, size, type) ;
-                     main_memory_datatypes_update(addr, value_human, size, type);
+                     main_memory_datatypes_update_or_create(addr, value_human, size, type);
                      break;
 
                 case 'w':
@@ -2437,7 +2505,7 @@ function main_memory_write_bydatatype ( addr, value, type, value_human )
                 case 'word':
                      size = word_size_bytes ;
                      ret = main_memory_write_nbytes(addr, value, size, type) ;
-                     main_memory_datatypes_update(addr, value_human, size, type);
+                     main_memory_datatypes_update_or_create(addr, value_human, size, type);
                      break;
 
                 case 'd':
@@ -2445,7 +2513,7 @@ function main_memory_write_bydatatype ( addr, value, type, value_human )
                 case 'double_word':
                      size = word_size_bytes * 2 ;
                      ret = main_memory_write_nbytes(addr, value, size, type) ;
-                     main_memory_datatypes_update(addr, value_human, size, type);
+                     main_memory_datatypes_update_or_create(addr, value_human, size, type);
                      break;
 
                 case 'string':
@@ -2459,13 +2527,13 @@ function main_memory_write_bydatatype ( addr, value, type, value_human )
                           ch = value.charCodeAt(i);
                           ch_h = value.charAt(i);
                           main_memory_write_nbytes(addr+i, ch.toString(16), 1, type) ;
-                          main_memory_datatypes_update(addr, value_human, size, type);
+                          main_memory_datatypes_update_or_create(addr+i, ch_h, 1, 'char');
                           size++ ;
                      }
 
                      if ( (type != 'ascii') && (type != 'ascii_not_null_end') ) {
                            main_memory_write_nbytes(addr+value.length, "00", 1, type) ;
-                           main_memory_datatypes_update(addr, value_human, size, type);
+                           main_memory_datatypes_update_or_create(addr+value.length, "0", 1, 'char');
                            size++ ;
                      }
                      break;
@@ -2475,13 +2543,13 @@ function main_memory_write_bydatatype ( addr, value, type, value_human )
                           main_memory_write_nbytes(addr+i, "00", 1, type) ;
                           size++ ;
                      }
-                     main_memory_datatypes_update(addr, value_human, size, type);
+                     main_memory_datatypes_update_or_create(addr, value_human, size, type);
                      break;
 
                 case 'instruction':
                      size = Math.ceil(value.toString().length / 2) ;
                      ret = main_memory_write_nbytes(addr, value, size, type) ;
-                     main_memory_datatypes_update(addr, value_human, size, type);
+                     main_memory_datatypes_update_or_create(addr, value_human, size, type);
                      break;
         }
 
@@ -2489,77 +2557,6 @@ function main_memory_write_bydatatype ( addr, value, type, value_human )
         creator_memory_updateall();
 
         return ret ;
-}
-
-function main_memory_datatypes_update ( addr, value_human, size, type )
-{
-        var data = main_memory_read(addr);
-        var data_type = data.data_type;
-        if (data_type == null){
-            main_memory_datatypes[addr] = main_memory_datatypes_packs_foravt(addr, value_human, type, size) ;
-            return;
-        }
-
-        // store byte to byte...
-        switch (data_type.type)
-        {
-                case 'b':
-                case 'byte':
-                    data_type.value = data.value;
-                     
-                    break;
-
-                case 'h':
-                case 'half':
-                case 'half_word':
-                    data_type.value = data.value;
-                     
-                    break;
-
-                case 'w':
-                case 'integer':
-                case 'float':
-                case 'word':
-                     data_type.value = data.value;
-                     
-                     break;
-
-                case 'd':
-                case 'double':
-                case 'double_word':
-                     data_type.value = data.value;
-                     
-                     break;
-
-                case 'string':
-                case 'ascii_null_end':
-                case 'asciiz':
-                case 'ascii_not_null_end':
-                case 'ascii':
-                     var ch   = 0 ;
-                     var ch_h = '';
-                     for (var i=0; i<value.length; i++) {
-                          // datatype
-                          main_memory_datatypes[addr+i] = main_memory_datatypes_packs_foravt(addr+i, ch_h, "ascii", 1) ;
-                          size++ ;
-                     }
-
-                     if ( (type != 'ascii') && (type != 'ascii_not_null_end') ) {
-                           main_memory_datatypes[addr+value.length] = main_memory_datatypes_packs_foravt(addr+value.length, "", "ascii", 1) ;
-                           size++ ;
-                     }
-                     break;
-
-                case 'space':
-                     data_type.value = data.value;
-                     
-                     break;
-
-                case 'instruction':
-                     data_type.value = data.value;
-                     
-                     break;
-        }
 }
 
 
@@ -2578,15 +2575,15 @@ function creator_memory_type2size ( type )
                 case 'b':
                 case 'bu':
                 case 'byte':
-                         size = 1 ;
-                         break;
+                     size = 1 ;
+                     break;
 
                 case 'h':
                 case 'hu':
                 case 'half':
                 case 'half_word':
-                         size = word_size_bytes / 2 ;
-                         break;
+                     size = word_size_bytes / 2 ;
+                     break;
 
                 case 'w':
                 case 'wu':
@@ -2594,15 +2591,15 @@ function creator_memory_type2size ( type )
                 case 'float':
                 case 'integer':
                 case 'instruction':
-                         size = word_size_bytes ;
-                         break;
+                     size = word_size_bytes ;
+                     break;
 
                 case 'd':
                 case 'du':
                 case 'double':
                 case 'double_word':
-                         size = word_size_bytes * 2 ;
-                         break;
+                      size = word_size_bytes * 2 ;
+                      break;
         }
 
         return size ;
@@ -2775,8 +2772,8 @@ function creator_memory_consolelog ( )
  ************************/
 
 // update an app._data.main_memory row:
-//  "000": { addr: 2003, addr_begin: "0x200", addr_end: "0x2003", 
-//           hex:[{byte: "1A", tag: "main"},...], 
+//  "000": { addr: 2003, addr_begin: "0x200", addr_end: "0x2003",
+//           hex:[{byte: "1A", tag: "main"},...],
 //           value: "1000", size: 4, eye: true, hex_packed: "1A000000" },
 //  ...
 
@@ -2979,7 +2976,7 @@ function creator_memory_is_segment_empty ( segment_name )
           var addrs    = main_memory_get_addresses() ;
           var insiders = addrs.filter(function(elto) {
                                          return creator_memory_is_address_inside_segment(segment_name, elto) ;
-                                      }); 
+                                      });
 
           return (insiders.length == 0) ;
 }
@@ -2987,18 +2984,18 @@ function creator_memory_is_segment_empty ( segment_name )
 
 function creator_memory_data_compiler ( data_address, value, size, dataLabel, DefValue, type )
 {
-	var ret = {
-		     msg: '',
-		     data_address: 0
-		  } ;
+        var ret = {
+                     msg: '',
+                     data_address: 0
+                  } ;
 
         // If align changes then zerofill first...
-	if ((data_address % align) > 0)
-	{
+        if ((data_address % align) > 0)
+        {
              var to_be_filled = align - (data_address % align) ;
              creator_memory_zerofill(data_address, to_be_filled);
              data_address = data_address + to_be_filled;
-	}
+        }
 
         if ((data_address % size != 0) && (data_address % word_size_bytes != 0)) {
             ret.msg = 'm21' ;
@@ -3066,8 +3063,8 @@ var load_architectures = [];
 /*Architectures card background*/
 var back_card = [];
 /*Load architecture*/
-var architecture = {components:[], instructions:[], directives:[], memory_layout:[]};
 var architecture_hash = [];
+var architecture = {arch_conf:[], memory_layout:[], components:[], instructions:[], directives:[]};
 
 
 
@@ -3239,7 +3236,7 @@ function load_arch_select ( cfg ) //TODO: repeated?
 
 
 //
-// Console.log
+// console_log
 //
 
 var creator_debug = false ;
@@ -3247,7 +3244,7 @@ var creator_debug = false ;
 function console_log ( msg )
 {
   if (creator_debug) {
-      console.log(msg) ;
+      console_log(msg) ;
   }
 }
 
@@ -3673,9 +3670,10 @@ function assembly_compiler()
           }
         }
 
+
         /*Check pending instructions*/
         for (var i = 0; i < pending_instructions.length; i++)
-  {
+        {
           var exit = 0;
           var signatureParts    = pending_instructions[i].signature;
           var signatureRawParts = pending_instructions[i].signatureRaw;
@@ -3683,14 +3681,13 @@ function assembly_compiler()
           console_log(instructionParts);
 
           for (var j = 0; j < signatureParts.length && exit == 0; j++)
-    {
+          {
             if (signatureParts[j] == "inm-signed" || signatureParts[j] == "inm-unsigned" || signatureParts[j] == "address")
             {
-
               for (var z = 0; z < instructions.length && exit == 0; z++)
-        {
+              {
                 if (instructions[z].Label == instructionParts[j])
-    {
+                {
                   var addr = instructions[z].Address;
                   var bin  = parseInt(addr, 16).toString(2);
                   var startbit = pending_instructions[i].startBit;
@@ -3699,97 +3696,105 @@ function assembly_compiler()
                   instructionParts[j] = addr;
                   var newInstruction  = "";
                   for (var w=0; w < instructionParts.length; w++)
-            {
-                      newInstruction = newInstruction + instructionParts[w];
-                      if (w != instructionParts.length-1) {
-                          newInstruction = newInstruction + " ";
-                      }
+                  {
+                    newInstruction = newInstruction + instructionParts[w];
+                    if (w != instructionParts.length-1) {
+                        newInstruction = newInstruction + " ";
+                    }
                   }
 
                   for (var w=0; w < instructions.length && exit == 0; w++)
-      {
-                       var aux = "0x" + (pending_instructions[i].address).toString(16);
-                       if (aux == instructions[w].Address) {
-                           instructions[w].loaded = newInstruction;
-                       }
+                  {
+                    var aux = "0x" + (pending_instructions[i].address).toString(16);
+                    if (aux == instructions[w].Address) {
+                      instructions[w].loaded = newInstruction;
+                    }
                   }
 
                   for (var w=0; w < instructions.length && exit == 0; w++)
-            {
-                       var aux = "0x" + (pending_instructions[i].address).toString(16);
-                       if (aux == instructions[w].Address)
-           {
-                           instructions[w].loaded = newInstruction;
-                           var fieldsLength = startbit - stopbit + 1;
-                           console_log(w)
-                           console_log(numBinaries)
-                           console_log(w - numBinaries)
-                     var iload =  instructions_binary[w - numBinaries].loaded;
-                           instructions_binary[w - numBinaries].loaded = iload.substring(0, iload.length - (startbit + 1)) + bin.padStart(fieldsLength, "0") + iload.substring(iload.length - stopbit, iload.length);
-                           exit = 1;
-                       }
+                  {
+                    var aux = "0x" + (pending_instructions[i].address).toString(16);
+                    if (aux == instructions[w].Address)
+                    {
+                      instructions[w].loaded = newInstruction;
+                      var fieldsLength = startbit - stopbit + 1;
+                      console_log(w)
+                      console_log(numBinaries)
+                      console_log(w - numBinaries)
+                      var iload =  instructions_binary[w - numBinaries].loaded;
+                      instructions_binary[w - numBinaries].loaded = iload.substring(0, iload.length - (startbit + 1)) + bin.padStart(fieldsLength, "0") + iload.substring(iload.length - stopbit, iload.length);
+                      exit = 1;
+                    }
                   }
                 }
               }
 
 
-        // NEW
-        var ret1 = creator_memory_findaddress_bytag(instructionParts[j]);
-        if (ret1.exit == 1)
-        {
-                    var addr = ret1.value;
-                    var bin  = parseInt(addr, 16).toString(2);
-                    var startbit = pending_instructions[i].startBit;
-                    var stopbit  = pending_instructions[i].stopBit;
-
-                    instructionParts[j] = "0x" + addr.toString(16);
-                    var newInstruction = "";
-                    for (var w=0; w < instructionParts.length; w++)
+              // NEW
+              var ret1 = creator_memory_findaddress_bytag(instructionParts[j]);
+              if (ret1.exit == 1)
               {
-                         newInstruction = newInstruction + instructionParts[w];
-                         if (w != instructionParts.length-1){
-                             newInstruction = newInstruction + " ";
-                         }
-                    }
-                    for (var w=0; w < instructions.length; w++)
-        {
-                         var aux = "0x" + (pending_instructions[i].address).toString(16);
-                         if (aux == instructions[w].Address) {
-                             instructions[w].loaded = newInstruction;
-                         }
-                    }
+                var addr = ret1.value;
+                var bin  = parseInt(addr, 16).toString(2);
+                var startbit = pending_instructions[i].startBit;
+                var stopbit  = pending_instructions[i].stopBit;
 
-                    for (var w=0; w < instructions.length && exit == 0; w++)
-        {
-                         var aux = "0x" + (pending_instructions[i].address).toString(16);
-                         if (aux == instructions[w].Address)
-       {
-                             instructions[w].loaded = newInstruction;
-                             var fieldsLength = startbit - stopbit + 1;
-                       var iload        = instructions_binary[w - numBinaries].loaded;
-                             instructions_binary[w - numBinaries].loaded = iload.substring(0, iload.length - (startbit + 1)) + bin.padStart(fieldsLength, "0") + iload.substring(iload.length - stopbit, iload.length);
-                             exit = 1;
-                         }
-                    }
-        }
+                instructionParts[j] = "0x" + addr.toString(16);
+                var newInstruction = "";
+                for (var w=0; w < instructionParts.length; w++)
+                {
+                  newInstruction = newInstruction + instructionParts[w];
+                  if (w != instructionParts.length-1){
+                    newInstruction = newInstruction + " ";
+                  }
+                }
+                for (var w=0; w < instructions.length; w++)
+                {
+                  var aux = "0x" + (pending_instructions[i].address).toString(16);
+                  if (aux == instructions[w].Address) {
+                    instructions[w].loaded = newInstruction;
+                  }
+                }
+
+                for (var w=0; w < instructions.length && exit == 0; w++)
+                {
+                  var aux = "0x" + (pending_instructions[i].address).toString(16);
+                  if (aux == instructions[w].Address)
+                  {
+                    instructions[w].loaded = newInstruction;
+                    var fieldsLength = startbit - stopbit + 1;
+                    var iload        = instructions_binary[w - numBinaries].loaded;
+                    instructions_binary[w - numBinaries].loaded = iload.substring(0, iload.length - (startbit + 1)) + bin.padStart(fieldsLength, "0") + iload.substring(iload.length - stopbit, iload.length);
+                    exit = 1;
+                  }
+                }
+              }
 
               if (exit == 0 && isNaN(instructionParts[j]) == true)
-        {
+              {
                 //tokenIndex = 0;
                 //nEnters = 0 ;
                 //tokenIndex=pending_instructions[i].line;
-                  nEnters=pending_instructions[i].line;
-                  instructions = [];
-                  pending_instructions = [];
-                  pending_tags = [];
-                  data_tag = [];
-                  instructions_binary = [];
-                  creator_memory_clear() ;
-                  data = [];
-                  extern = [];
-                  return packCompileError('m7', instructionParts[j], "error", "danger");
+                nEnters=pending_instructions[i].line;
+                instructions = [];
+                pending_instructions = [];
+                pending_tags = [];
+                data_tag = [];
+                instructions_binary = [];
+                creator_memory_clear() ;
+                data = [];
+                extern = [];
+                return packCompileError('m7', instructionParts[j], "error", "danger");
               }
             }
+
+
+
+
+
+
+
+
 
             if (signatureParts[j] == "offset_words")
             {
@@ -3804,8 +3809,54 @@ function assembly_compiler()
                   addr = ((addr - pending_instructions[i].address)/4)-1;
                   console_log(instructionParts);
                   console_log(addr);
-                  var bin = bi_intToBigInt(addr,10).toString(2);
-                  bin = bin.substring((startbit-stopbit)+1,bin.length)
+
+
+                  if (startbit.length > 1 && stopbit.length)
+                  {
+                    var fieldsLength = 0;
+                    for (var s = 0; s < startbit.length; s++) {
+                      fieldsLength = fieldsLength + startbit[s]-stopbit[s]+1;
+                    }
+
+                    console_log(fieldsLength);
+                    var bin = bi_intToBigInt(addr,10).toString(2);
+                    bin = bin.padStart(fieldsLength, "0");
+                    console_log(bin);
+
+                    var last_segment = 0;
+                    for (var s = 0; s < startbit.length; s++)
+                    {
+                      var starbit_aux = 31 - startbit[s]; //TODO: using nwords
+                      var stopbit_aux = 32 - stopbit[s]; //TODO: using nwords
+
+                      var fieldsLength2 = stopbit_aux - starbit_aux;
+                      var bin_aux = bin.substring(last_segment, fieldsLength2 + last_segment);
+
+                      last_segment = last_segment + fieldsLength2
+
+                      for (var w = 0; w < instructions.length && exit == 0; w++) {
+                        var aux = "0x" + (pending_instructions[i].address).toString(16);
+                        if(aux == instructions[w].Address){
+                          instructions_binary[w - numBinaries].loaded = instructions_binary[w - numBinaries].loaded.substring(0, instructions_binary[w - numBinaries].loaded.length - (startbit[s] + 1)) + bin_aux + instructions_binary[w - numBinaries].loaded.substring(instructions_binary[w - numBinaries].loaded.length - stopbit[s], instructions_binary[w - numBinaries].loaded.length);
+                        }
+                      }
+                    }
+                  }
+                  else
+                  {
+                    var fieldsLength = (startbit-stopbit)+1;
+                    console_log(fieldsLength);
+                    var bin = bi_intToBigInt(addr,10).toString(2);
+                    bin = bin.padStart(fieldsLength, "0");
+                    console_log(bin);
+
+                    for (var w = 0; w < instructions.length && exit == 0; w++) {
+                      var aux = "0x" + (pending_instructions[i].address).toString(16);
+                      if(aux == instructions[w].Address){
+                        instructions_binary[w - numBinaries].loaded = instructions_binary[w - numBinaries].loaded.substring(0, instructions_binary[w - numBinaries].loaded.length - (startbit + 1)) + bin.padStart(fieldsLength, "0") + instructions_binary[w - numBinaries].loaded.substring(instructions_binary[w - numBinaries].loaded.length - stopbit, instructions_binary[w - numBinaries].loaded.length);
+                      }
+                    }
+                  }
 
                   instructionParts[j] = addr;
                   var newInstruction = "";
@@ -3817,23 +3868,12 @@ function assembly_compiler()
                       newInstruction = newInstruction + instructionParts[w] + " ";
                     }
                   }
-                  for (var w = 0; w < instructions.length && exit == 0; w++) {
-                    var aux = "0x" + (pending_instructions[i].address).toString(16);
-                    if(aux == instructions[w].Address){
-                      instructions[w].loaded = newInstruction;
-                    }
-                  }
 
+                  //Load new instruction
                   for (var w = 0; w < instructions.length && exit == 0; w++) {
                     var aux = "0x" + (pending_instructions[i].address).toString(16);
                     if(aux == instructions[w].Address){
                       instructions[w].loaded = newInstruction;
-                      var fieldsLength = startbit - stopbit + 1;
-                      console_log(w);
-                      console_log(numBinaries);
-                      console_log(w - numBinaries);
-                      console_log(bin.padStart(fieldsLength, "0"));
-                      instructions_binary[w - numBinaries].loaded = instructions_binary[w - numBinaries].loaded.substring(0, instructions_binary[w - numBinaries].loaded.length - (startbit + 1)) + bin.padStart(fieldsLength, "0") + instructions_binary[w - numBinaries].loaded.substring(instructions_binary[w - numBinaries].loaded.length - stopbit, instructions_binary[w - numBinaries].loaded.length);
                       exit = 1;
                     }
                   }
@@ -3864,9 +3904,10 @@ function assembly_compiler()
                   var startbit = pending_instructions[i].startBit;
                   var stopbit = pending_instructions[i].stopBit;
 
-                  addr = ((addr - pending_instructions[i].address))-1;
+                  var fieldsLength = (startbit-stopbit)+1;
                   var bin = bi_intToBigInt(addr,10).toString(2);
-                  bin = bin.substring((startbit-stopbit)+1,bin.length)
+                  //bin = bin.substring((startbit-stopbit)+1,bin.length)
+                  bin = bin.padStart(fieldsLength, "0");
 
                   instructionParts[j] = addr;
                   var newInstruction = "";
@@ -6090,7 +6131,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     // aqui_ahora
                 } else {
                   fieldsLength = architecture.instructions[i].fields[a].startbit - architecture.instructions[i].fields[a].stopbit + 1;
-console_log((architecture.instructions[i].co).padStart(fieldsLength, "0"));
+                  console_log((architecture.instructions[i].co).padStart(fieldsLength, "0"));
                   binary = binary.substring(0, binary.length - (architecture.instructions[i].fields[a].startbit + 1)) + (architecture.instructions[i].co).padStart(fieldsLength, "0") + binary.substring(binary.length - (architecture.instructions[i].fields[a].stopbit), binary.length);
                 }
 
@@ -6673,26 +6714,29 @@ function getFieldLength(separated, startbit, stopbit,a)
 */
 function generateBinary(separated, startbit, stopbit, binary, inm,fieldsLenght, a)
 {
-  if (!separated ||!separated[a])
+  if (!separated ||!separated[a]){
       binary = binary.substring(0, binary.length - (startbit + 1)) + inm.padStart(fieldsLength, "0") + binary.substring(binary.length - (stopbit ), binary.length);
-  else {
-      // check if the value fit on the first segment
-      let myInm = inm;
-      for (let i = startbit.length-1; i >= 0;  i--) {
-    let sb = startbit[i],
-        stb = stopbit[i],
-        diff = sb - stb+1;
-    if (myInm.length <= diff) {
+  }
+  else 
+  {
+    // check if the value fit on the first segment
+    let myInm = inm;
+    for (let i = startbit.length-1; i >= 0;  i--) {
+      let sb = startbit[i],
+      stb = stopbit[i],
+      diff = sb - stb+1;
+      if (myInm.length <= diff) {
         binary = binary.substring(0, binary.length - (sb+1)) +
-      myInm.padStart(diff, "0") +
-      binary.substring((binary.length - stb), binary.length);
+        myInm.padStart(diff, "0") +
+        binary.substring((binary.length - stb), binary.length);
         break;
-    } else {
+      } 
+      else {
         let tmpinm = inm.substring(myInm.length - diff, myInm.length);
         binary = binary.substring(0, binary.length - (sb+1)) + tmpinm.padStart(diff, "0") + binary.substring(binary.length - stb, binary.length);
         myInm = myInm.substring(0,(myInm.length-diff));
-    }
       }
+    }
   }
   return binary;
 }
@@ -6849,38 +6893,101 @@ function execute_instruction ( )
       var numCopCorrect = 0;
 
       for (var y = 0; y < architecture.instructions[i].fields.length; y++) {
-        if(architecture.instructions[i].fields[y].type == "co"){
+        if(architecture.instructions[i].fields[y].type == "co")
+        {
           coStartbit = 31 - parseInt(architecture.instructions[i].fields[y].startbit);
           coStopbit = 32 - parseInt(architecture.instructions[i].fields[y].stopbit);
         }
       }
 
-      if(architecture.instructions[i].co == instructionExecParts[0].substring(coStartbit,coStopbit)){
-        if(architecture.instructions[i].cop != null && architecture.instructions[i].cop != ''){
-          for (var j = 0; j < architecture.instructions[i].fields.length; j++){
-            if (architecture.instructions[i].fields[j].type == "cop") {
+      if(architecture.instructions[i].co == instructionExecParts[0].substring(coStartbit,coStopbit))
+      {
+        if(architecture.instructions[i].cop != null && architecture.instructions[i].cop != '')
+        {
+          for (var j = 0; j < architecture.instructions[i].fields.length; j++)
+          {
+            if (architecture.instructions[i].fields[j].type == "cop")
+            {
               numCop++;
               if (architecture.instructions[i].fields[j].valueField == instructionExecParts[0].substring(((architecture.instructions[i].nwords*31) - architecture.instructions[i].fields[j].startbit), ((architecture.instructions[i].nwords*32) - architecture.instructions[i].fields[j].stopbit))) {
                 numCopCorrect++;
               }
             }
           }
-          if(numCop == numCopCorrect){
-            auxDef = architecture.instructions[i].definition;
-            nwords = architecture.instructions[i].nwords;
-            binary = true;
-            auxIndex = i;
-            break;
+          if(numCop != numCopCorrect){
+            continue;
           }
         }
-        else{
-          auxDef = architecture.instructions[i].definition;
-          nwords = architecture.instructions[i].nwords;
-          binary = true;
-          type = architecture.instructions[i].type;
-          auxIndex = i;
-          break;
+
+        var instruction_loaded    = architecture.instructions[i].signature_definition;
+        var instruction_fields    = architecture.instructions[i].fields;
+        var instruction_nwords    = architecture.instructions[i].nwords;   
+
+        for (var f = 0; f < instruction_fields.length; f++) 
+        {
+          re = new RegExp("[Ff]"+f);
+          var res = instruction_loaded.search(re);
+
+          if (res != -1)
+          {
+            var value = null;
+            re = new RegExp("[Ff]"+f, "g");
+            switch(instruction_fields[f].type)
+            {
+              case "co":
+                value = instruction_fields[f].name;
+                break;
+
+              //TODO: unify register type by register file on architecture
+              case "INT-Reg":
+                var bin = instructionExec.substring(((instruction_nwords*31) - instruction_fields[f].startbit), ((instruction_nwords*32) - instruction_fields[f].stopbit));
+                value = get_register_binary ("int_registers", bin);
+                break; 
+              case "SFP-Reg":
+                var bin = instructionExec.substring(((instruction_nwords*31) - instruction_fields[f].startbit), ((instruction_nwords*32) - instruction_fields[f].stopbit));
+                value = get_register_binary ("fp_registers", bin);
+                break; 
+              case "DFP-Reg":
+                var bin = instructionExec.substring(((instruction_nwords*31) - instruction_fields[f].startbit), ((instruction_nwords*32) - instruction_fields[f].stopbit));
+                value = get_register_binary ("fp_registers", bin);
+                break; 
+              case "Ctrl-Reg":
+                var bin = instructionExec.substring(((instruction_nwords*31) - instruction_fields[f].startbit), ((instruction_nwords*32) - instruction_fields[f].stopbit));
+                value = get_register_binary ("ctrl_registers", bin);
+                break; 
+
+              case "inm-signed":
+              case "inm-unsigned":
+              case "address":
+              case "offset_bytes":
+              case "offset_words":
+                var bin = "";
+
+                //Get binary
+                if(architecture.instructions[i].separated && architecture.instructions[i].separated[f] == true){
+                  for (var sep_index = 0; sep_index < architecture.instructions[i].fields[f].startbit.length; sep_index++) {
+                    bin = bin + instructionExec.substring(((instruction_nwords*31) - instruction_fields[f].startbit[sep_index]), ((instruction_nwords*32) - instruction_fields[f].stopbit[sep_index]))
+                  }
+                }
+                else{
+                  bin = instructionExec.substring(((instruction_nwords*31) - instruction_fields[f].startbit), ((instruction_nwords*32) - instruction_fields[f].stopbit))
+                }
+                value = get_number_binary (bin);
+
+                break; 
+
+              default:
+                break
+            }
+            instruction_loaded = instruction_loaded.replace(re, value);
+          }
         }
+
+        instructionExec = instruction_loaded;
+        instructionExecParts = instructionExec.split(' ');
+
+        binary = true;
+        auxIndex = i;
       }
 
       if (architecture.instructions[i].name == instructionExecParts[0] && instructionExecParts.length == auxSig.length)
@@ -6935,74 +7042,69 @@ function execute_instruction ( )
       var readings_description = "";
       var writings_description = "";
 
-      if (binary == true) {
-        auxDef = execute_binary(auxIndex, instructionExecParts, auxDef);
+      //TODO: move to the compilation stage
+      re = new RegExp(signatureDef+"$");
+      var match = re.exec(instructionExec);
+      instructionExecParts = [];
+
+      for(var j = 1; j < match.length; j++){
+        instructionExecParts.push(match[j]);
       }
-      else{
-        //TODO: move to the compilation stage
-        re = new RegExp(signatureDef+"$");
-        var match = re.exec(instructionExec);
-        instructionExecParts = [];
+      //END TODO
 
-        for(var j = 1; j < match.length; j++){
-          instructionExecParts.push(match[j]);
-        }
-        //END TODO
+      console_log(instructionExecParts);
 
-        console_log(instructionExecParts);
+      var var_readings_definitions      = {};
+      var var_readings_definitions_prev = {};
+      var var_readings_definitions_name = {};
+      var var_writings_definitions      = {};
 
-        var var_readings_definitions      = {};
-        var var_readings_definitions_prev = {};
-        var var_readings_definitions_name = {};
-        var var_writings_definitions      = {};
-
-        //Generate all registers, values, etc. readings
-        for (var i = 1; i < signatureRawParts.length; i++)
+      //Generate all registers, values, etc. readings
+      for (var i = 1; i < signatureRawParts.length; i++)
+      {
+        if (signatureParts[i] == "INT-Reg" || signatureParts[i] == "SFP-Reg" || signatureParts[i] == "DFP-Reg" || signatureParts[i] == "Ctrl-Reg")
         {
-          if (signatureParts[i] == "INT-Reg" || signatureParts[i] == "SFP-Reg" || signatureParts[i] == "DFP-Reg" || signatureParts[i] == "Ctrl-Reg")
+          for (var j = 0; j < architecture.components.length; j++)
           {
-            for (var j = 0; j < architecture.components.length; j++)
+            for (var z = architecture.components[j].elements.length-1; z >= 0; z--)
             {
-              for (var z = architecture.components[j].elements.length-1; z >= 0; z--)
+              if (architecture.components[j].elements[z].name.includes(instructionExecParts[i]))
               {
-                if (architecture.components[j].elements[z].name.includes(instructionExecParts[i]))
-                {
-                  var_readings_definitions[signatureRawParts[i]]      = "var " + signatureRawParts[i] + "      = readRegister ("+j+" ,"+z+", \""+ signatureParts[i] + "\");\n"
-                  var_readings_definitions_prev[signatureRawParts[i]] = "var " + signatureRawParts[i] + "_prev = readRegister ("+j+" ,"+z+", \""+ signatureParts[i] + "\");\n"
-                  var_readings_definitions_name[signatureRawParts[i]] = "var " + signatureRawParts[i] + "_name = '" + instructionExecParts[i] + "';\n";
+                var_readings_definitions[signatureRawParts[i]]      = "var " + signatureRawParts[i] + "      = readRegister ("+j+" ,"+z+", \""+ signatureParts[i] + "\");\n"
+                var_readings_definitions_prev[signatureRawParts[i]] = "var " + signatureRawParts[i] + "_prev = readRegister ("+j+" ,"+z+", \""+ signatureParts[i] + "\");\n"
+                var_readings_definitions_name[signatureRawParts[i]] = "var " + signatureRawParts[i] + "_name = '" + instructionExecParts[i] + "';\n";
 
-                  re = new RegExp( "(?:\\W|^)(((" + signatureRawParts[i] +") *=)[^=])", "g");
-                  //If the register is in the left hand than '=' then write register always
-                  if(auxDef.search(re) != -1){
-                    var_writings_definitions[signatureRawParts[i]]  = "writeRegister("+ signatureRawParts[i] +", "+j+", "+z+", \""+ signatureParts[i] + "\");\n";
-                  }
-                  //Write register only if value is diferent
-                  else{
-                    var_writings_definitions[signatureRawParts[i]]  = "if(" + signatureRawParts[i] + " != " + signatureRawParts[i] + "_prev)" +
-                                                                      " { writeRegister("+ signatureRawParts[i]+" ,"+j+" ,"+z+", \""+ signatureParts[i] + "\"); }\n";
-                  }
-
+                re = new RegExp( "(?:\\W|^)(((" + signatureRawParts[i] +") *=)[^=])", "g");
+                //If the register is in the left hand than '=' then write register always
+                if(auxDef.search(re) != -1){
+                  var_writings_definitions[signatureRawParts[i]]  = "writeRegister("+ signatureRawParts[i] +", "+j+", "+z+", \""+ signatureParts[i] + "\");\n";
                 }
+                //Write register only if value is diferent
+                else{
+                  var_writings_definitions[signatureRawParts[i]]  = "if(" + signatureRawParts[i] + " != " + signatureRawParts[i] + "_prev)" +
+                                                                    " { writeRegister("+ signatureRawParts[i]+" ,"+j+" ,"+z+", \""+ signatureParts[i] + "\"); }\n";
+                }
+
               }
             }
           }
-          else{
-            var_readings_definitions[signatureRawParts[i]] = "var " + signatureRawParts[i] + " = " + instructionExecParts[i] + ";\n";
-          }
         }
+        else{
+          var_readings_definitions[signatureRawParts[i]] = "var " + signatureRawParts[i] + " = " + instructionExecParts[i] + ";\n";
+        }
+      }
 
-        for (var elto in var_readings_definitions){
-           readings_description = readings_description + var_readings_definitions[elto];
-        }
-        for (var elto in var_readings_definitions_prev){
-           readings_description = readings_description + var_readings_definitions_prev[elto];
-        }
-        for (var elto in var_readings_definitions_name){
-           readings_description = readings_description + var_readings_definitions_name[elto];
-        }
-        for (var elto in var_writings_definitions){
-           writings_description = writings_description + var_writings_definitions[elto];
-        }
+      for (var elto in var_readings_definitions){
+         readings_description = readings_description + var_readings_definitions[elto];
+      }
+      for (var elto in var_readings_definitions_prev){
+         readings_description = readings_description + var_readings_definitions_prev[elto];
+      }
+      for (var elto in var_readings_definitions_name){
+         readings_description = readings_description + var_readings_definitions_name[elto];
+      }
+      for (var elto in var_writings_definitions){
+         writings_description = writings_description + var_writings_definitions[elto];
       }
 
       // writeRegister and readRegister direcly named include into the definition
@@ -7532,150 +7634,30 @@ function keyboard_read ( fn_post_read, fn_post_params )
  *  Execute binary
  */
 
-function execute_binary ( index, instructionExecParts, auxDef )
+function get_register_binary (type, bin)
 {
-  console_log("Binary");
-
-  for (var j = 0; j < architecture.instructions[index].fields.length; j++)
+  for (var i = 0; i < architecture.components.length; i++)
   {
-    console_log(instructionExecParts[0]);
-    console_log(architecture.instructions[index].fields.length);
-    if(architecture.instructions[index].fields[j].type == "INT-Reg" || architecture.instructions[index].fields[j].type == "SFP-Reg" || architecture.instructions[index].fields[j].type == "DFP-Reg" || architecture.instructions[index].fields[j].type == "Ctrl-Reg") {
-      console_log(instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit)));
-
-      for (var z = 0; z < architecture.components.length; z++){
-        console_log(architecture.components[z].type)
-        if(architecture.components[z].type == "ctrl_registers" && architecture.instructions[index].fields[j].type == "Ctrl-Reg"){
-          for (var w = 0; w < architecture.components[z].elements.length; w++){
-            var auxLength = ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit) - ((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit);
-            console_log(auxLength);
-            console_log((w.toString(2)).padStart(auxLength, "0"));
-            if((w.toString(2)).padStart(auxLength, "0") == instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))){
-
-            }
-          }
-        }
-        if(architecture.components[z].type == "int_registers" && architecture.instructions[index].fields[j].type == "INT-Reg"){
-          for (var w = 0; w < architecture.components[z].elements.length; w++){
-            var auxLength = ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit) - ((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit);
-            console_log(auxLength);
-            console_log((w.toString(2)).padStart(auxLength, "0"));
-            if((w.toString(2)).padStart(auxLength, "0") == instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))){
-              var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-              auxDef = auxDef.replace(re, architecture.components[z].elements[w].name[0]);
-            }
-          }
-        }
-        if(architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == false && architecture.instructions[index].fields[j].type == "SFP-Reg"){
-          for (var w = 0; w < architecture.components[z].elements.length; w++){
-            var auxLength = ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit) - ((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit);
-            console_log(auxLength);
-            console_log((w.toString(2)).padStart(auxLength, "0"));
-            if((w.toString(2)).padStart(auxLength, "0") == instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))){
-              var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-              auxDef = auxDef.replace(re, architecture.components[z].elements[w].name[0]);
-            }
-          }
-        }
-        if(architecture.components[z].type == "fp_registers" && architecture.components[z].double_precision == true && architecture.instructions[index].fields[j].type == "DFP-Reg"){
-          for (var w = 0; w < architecture.components[z].elements.length; w++){
-            var auxLength = ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit) - ((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit);
-            console_log(auxLength);
-            console_log((w.toString(2)).padStart(auxLength, "0"));
-            if((w.toString(2)).padStart(auxLength, "0") == instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))){
-              var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-              auxDef = auxDef.replace(re, architecture.components[z].elements[w].name[0]);
-            }
-          }
+    if(architecture.components[i].type == type)
+    {
+      for (var j = 0; j < architecture.components[i].elements.length; j++)
+      {
+        var len = bin.length;
+        if((j.toString(2)).padStart(len, "0") == bin){
+          return architecture.components[i].elements[j].name[0];
         }
       }
-    }
-
-    if(architecture.instructions[index].fields[j].type == "inm-signed"){
-      var value = "";
-      if(architecture.instructions[index].separated && architecture.instructions[index].separated[j] == true){
-        for (var sep_index = 0; sep_index < architecture.instructions[index].fields[j].startbit.length; sep_index++) {
-          value = value + instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit[sep_index]), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit[sep_index]))
-        }
-      }
-      else{
-        value = instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))
-      }
-      var valueSign = value.charAt(0);
-      var newValue =  value.padStart(32, valueSign) ;
-      newValue = parseInt(newValue, 2) ;
-      var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-      auxDef = auxDef.replace(re, newValue >> 0);
-    }
-
-    if(architecture.instructions[index].fields[j].type == "inm-unsigned"){
-      var value = "";
-      if(architecture.instructions[index].separated && architecture.instructions[index].separated[j] == true){
-        for (var sep_index = 0; sep_index < architecture.instructions[index].fields[j].startbit.length; sep_index++) {
-          value = value + instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit[sep_index]), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit[sep_index]))
-        }
-      }
-      else{
-        value = instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))
-      }
-      newValue = parseInt(newValue, 2) ;
-      var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-      auxDef = auxDef.replace(re, newValue >> 0);
-    }
-
-    if(architecture.instructions[index].fields[j].type == "address"){
-      var value = "";
-      if(architecture.instructions[index].separated && architecture.instructions[index].separated[j] == true){
-        for (var sep_index = 0; sep_index < architecture.instructions[index].fields[j].startbit.length; sep_index++) {
-          value = value + instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit[sep_index]), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit[sep_index]))
-        }
-      }
-      else{
-        value = instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))
-      }
-      var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-      auxDef = auxDef.replace(re, parseInt(value, 2));
-    }
-
-    if(architecture.instructions[index].fields[j].type == "offset_words"){
-      var value = "";
-      if(architecture.instructions[index].separated && architecture.instructions[index].separated[j] == true){
-        for (var sep_index = 0; sep_index < architecture.instructions[index].fields[j].startbit.length; sep_index++) {
-          value = value + instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit[sep_index]), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit[sep_index]))
-        }
-      }
-      else{
-        value = instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))
-      }
-      var valueSign = value.charAt(0);
-      var newValue =  value.padStart(32, valueSign) ;
-      newValue = parseInt(newValue, 2) ;
-      var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-      auxDef = auxDef.replace(re, newValue >> 0);
-    }
-
-    if(architecture.instructions[index].fields[j].type == "offset_bytes"){
-      var value = "";
-      if(architecture.instructions[index].separated &&  architecture.instructions[index].separated[j] == true){
-        for (var sep_index = 0; sep_index < architecture.instructions[index].fields[j].startbit.length; sep_index++) {
-          value = value + instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit[sep_index]), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit[sep_index]))
-        }
-      }
-      else{
-        value = instructionExecParts[0].substring(((architecture.instructions[index].nwords*31) - architecture.instructions[index].fields[j].startbit), ((architecture.instructions[index].nwords*32) - architecture.instructions[index].fields[j].stopbit))
-      }
-      var valueSign = value.charAt(0);
-      var newValue =  value.padStart(32, valueSign) ;
-      newValue = parseInt(newValue, 2) ;
-      var re = new RegExp(architecture.instructions[index].fields[j].name,"g");
-      auxDef = auxDef.replace(re, newValue >> 0);
     }
   }
 
-  return auxDef;
+  return null;
 }
 
-/*
+
+function get_number_binary (bin)
+{
+  return "0x" + bin2hex(bin);
+}/*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.

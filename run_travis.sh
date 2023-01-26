@@ -24,6 +24,25 @@ do
 done
 
 echo ""
+echo " MIPS: libraries"
+MIPS_TEST="001"
+for I in $MIPS_TEST;
+do
+   echo -n " * ./travis/mips/correct/libraries/test_mips_libraries_$I..."
+   ./creator.sh -a ./architecture/MIPS_32.json \
+                -l ./travis/mips/correct/libraries/test_mips_libraries_$I.o \
+                -s ./travis/mips/correct/libraries/test_mips_libraries_$I.s -o min > /tmp/e-$I.out
+   diff /tmp/e-$I.out ./travis/mips/correct/libraries/test_mips_libraries_$I.out
+   if [ $? -ne 0 ]; then
+       echo "Different: Error $I with different outputs...";
+       error=1
+   else
+       echo "Equals";
+   fi
+   rm   /tmp/e-$I.out
+done
+
+echo ""
 echo " MIPS: syscalls"
 MIPS_TEST="001 002 003 004 009 010 011"
 for I in $MIPS_TEST;
@@ -139,6 +158,25 @@ do
 done
 
 echo ""
+echo " RISC-V libraries:"
+RV_TEST="001"
+for I in $RV_TEST;
+do
+  echo -n " * ./travis/riscv/correct/libraries/test_riscv_libraries_$I: "
+  ./creator.sh -a ./architecture/RISC_V_RV32IMFD.json \
+               -l ./travis/riscv/correct/libraries/test_riscv_libraries_$I.o \
+               -s ./travis/riscv/correct/libraries/test_riscv_libraries_$I.s -o min > /tmp/e-$I.out
+  diff /tmp/e-$I.out ./travis/riscv/correct/libraries/test_riscv_libraries_$I.out
+  if [ $? -ne 0 ]; then
+       echo "Different: Error $I with different outputs...";
+       error=1
+  else
+       echo "Equals";
+  fi
+  rm   /tmp/e-$I.out
+done
+
+echo ""
 echo " RISC-V syscalls:"
 RV_TEST="001 002 003 004 009 010 011"
 for I in $RV_TEST;
@@ -212,7 +250,7 @@ done
 
 echo ""
 echo " RISC-V: instructions"
-RV_TEST="001 002 003 004 005 006 007 008 009 010 011 012 013 014 015 016 017 018 019 020 021 022 023 024 025 026 027 028 029 030 031 032 033 034 035 036 037 038 039 040 041 042 043 044 045 046 047 048 049 050 051 052 053 054 055 056 057 058 059 060 061 062 063 064 065"
+RV_TEST="001 002 003 004 005 006 007 008 009 010 011 012 013 014 015 016 018 019 020 021 022 023 024 025 026 027 028 029 030 031 032 033 034 035 036 037 038 039 040 041 042 043 044 045 046 047 048 049 050 051 052 053 054 055 056 057 058 059 060 061 062 063 064 065"
 for I in $RV_TEST;
 do
    echo -n " * ./travis/riscv/instructions/test_riscv_instruction_$I: "
@@ -234,6 +272,7 @@ done
 # Return
 #
 
-if [[ -v error ]]; then
+if [[ -n "$error" ]]; then
+    echo "Error(s) found."
     exit -1
 fi

@@ -30,6 +30,17 @@
 
     </details>
 
+  - Libraries:
+  
+    <details>
+      <summary>Click to expand</summary>
+
+      | Test Name                | Description               | In use             |
+      |:------------------------:|:-------------------------:|:------------------:|
+      | test_riscv_libraries_001 | Min and Max               | :white_check_mark: |
+
+    </details>
+
   - System calls:
   
     <details>
@@ -171,7 +182,7 @@
       | test_riscv_instruction_014 | lbu, lhu                  | :white_check_mark: |
       | test_riscv_instruction_015 | slti                      | :white_check_mark: |
       | test_riscv_instruction_016 | sltiu                     | :white_check_mark: |
-      | test_riscv_instruction_017 | xori                      | :white_check_mark: |
+      | test_riscv_instruction_017 | xori                      | :heavy_multiplication_x: |
       | test_riscv_instruction_018 | ori                       | :white_check_mark: |
       | test_riscv_instruction_019 | andi                      | :white_check_mark: |
       | test_riscv_instruction_020 | div-2reg                  | :white_check_mark: |
@@ -246,6 +257,17 @@
       | test_mips_example_009 | I/O Syscalls + Strings    | :heavy_multiplication_x: |
       | test_mips_example_011 | Subrutines                | :white_check_mark:       |
       | test_mips_example_012 | Factorial                 | :white_check_mark:       |
+
+    </details>
+
+  - Libraries:
+  
+    <details>
+      <summary>Click to expand</summary>
+
+      | Test Name               | Description               | In use             |
+      |:-----------------------:|:-------------------------:|:------------------:|
+      | test_mpis_libraries_001 | Min and Max               | :white_check_mark: |
 
     </details>
 
