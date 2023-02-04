@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -97,7 +98,7 @@
                         show_notification(e.name + ' architecture has been loaded correctly', 'success');
 
                         // Google Analytics
-                        creator_ga('architecture', 'architecture.loading', 'architectures.loading.customized' + e.name);
+                        creator_ga('architecture', 'architecture.loading', 'architectures.loading.preload_' + e.name);
 
                         return;
                       }
@@ -117,7 +118,7 @@
                       show_notification(e.name + ' architecture has been loaded correctly', 'success');
 
                       // Google Analytics
-                      creator_ga('architecture', 'architecture.loading', 'architectures.loading.customized');
+                      creator_ga('architecture', 'architecture.loading', 'architectures.loading.preload_cache');
 
                       }).fail(function() {
                         hide_loading();
@@ -249,7 +250,7 @@
                         }
                       }
                     }
-                    if(type == 0)
+                    if(type === 0)
                     {
                       for (var i = 0; i < back_card.length; i++){
                         this._props.back_card[i].background = "default";

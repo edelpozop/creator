@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -130,42 +131,42 @@ var load_binary = false;
 var totalStats = 0;
 var stats_value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 var stats = [
-  { type: 'Arithmetic floating point', number_instructions: 0, percentage: 0 },
-  { type: 'Arithmetic integer', number_instructions: 0, percentage: 0},
-  { type: 'Comparison', number_instructions: 0, percentage: 0 },
-  { type: 'Conditional bifurcation', number_instructions: 0, percentage: 0},
-  { type: 'Control', number_instructions: 0, percentage: 0},
-  { type: 'Function call', number_instructions: 0, percentage: 0},
-  { type: 'I/O', number_instructions: 0, percentage: 0},
-  { type: 'Logic', number_instructions: 0, percentage: 0, abbreviation: "Log"},
-  { type: 'Memory access', number_instructions: 0, percentage: 0},
-  { type: 'Other', number_instructions: 0, percentage: 0},
-  { type: 'Syscall', number_instructions: 0, percentage: 0},
-  { type: 'Transfer between registers', number_instructions: 0, percentage: 0},
-  { type: 'Unconditional bifurcation', number_instructions: 0, percentage: 0},
-];
-/*Power consumption*/
-var total_power_consumption = 0;
-var power_consumption_value = [
-                                {
-                                  data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                                }
-                              ];
-var power_consumption = [
-  { type: 'Arithmetic floating point', power_consumption: 0, percentage: 0 },
-  { type: 'Arithmetic integer', power_consumption: 0, percentage: 0},
-  { type: 'Comparison', power_consumption: 0, percentage: 0 },
-  { type: 'Conditional bifurcation', power_consumption: 0, percentage: 0},
-  { type: 'Control', power_consumption: 0, percentage: 0},
-  { type: 'Function call', power_consumption: 0, percentage: 0},
-  { type: 'I/O', power_consumption: 0, percentage: 0},
-  { type: 'Logic', power_consumption: 0, percentage: 0, abbreviation: "Log"},
-  { type: 'Memory access', power_consumption: 0, percentage: 0},
-  { type: 'Other', power_consumption: 0, percentage: 0},
-  { type: 'Syscall', power_consumption: 0, percentage: 0},
-  { type: 'Transfer between registers', power_consumption: 0, percentage: 0},
-  { type: 'Unconditional bifurcation', power_consumption: 0, percentage: 0},
-];
+              { type: 'Arithmetic floating point', number_instructions: 0, percentage: 0 },
+              { type: 'Arithmetic integer', number_instructions: 0, percentage: 0},
+              { type: 'Comparison', number_instructions: 0, percentage: 0 },
+              { type: 'Conditional bifurcation', number_instructions: 0, percentage: 0},
+              { type: 'Control', number_instructions: 0, percentage: 0},
+              { type: 'Function call', number_instructions: 0, percentage: 0},
+              { type: 'I/O', number_instructions: 0, percentage: 0},
+              { type: 'Logic', number_instructions: 0, percentage: 0, abbreviation: "Log"},
+              { type: 'Memory access', number_instructions: 0, percentage: 0},
+              { type: 'Other', number_instructions: 0, percentage: 0},
+              { type: 'Syscall', number_instructions: 0, percentage: 0},
+              { type: 'Transfer between registers', number_instructions: 0, percentage: 0},
+              { type: 'Unconditional bifurcation', number_instructions: 0, percentage: 0},
+            ];
+/*CLK Cycles*/
+var total_clk_cycles = 0;
+var clk_cycles_value =  [
+                          {
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                          }
+                        ];
+var clk_cycles =  [
+                    { type: 'Arithmetic floating point', clk_cycles: 0, percentage: 0 },
+                    { type: 'Arithmetic integer', clk_cycles: 0, percentage: 0},
+                    { type: 'Comparison', clk_cycles: 0, percentage: 0 },
+                    { type: 'Conditional bifurcation', clk_cycles: 0, percentage: 0},
+                    { type: 'Control', clk_cycles: 0, percentage: 0},
+                    { type: 'Function call', clk_cycles: 0, percentage: 0},
+                    { type: 'I/O', clk_cycles: 0, percentage: 0},
+                    { type: 'Logic', clk_cycles: 0, percentage: 0, abbreviation: "Log"},
+                    { type: 'Memory access', clk_cycles: 0, percentage: 0},
+                    { type: 'Other', clk_cycles: 0, percentage: 0},
+                    { type: 'Syscall', clk_cycles: 0, percentage: 0},
+                    { type: 'Transfer between registers', clk_cycles: 0, percentage: 0},
+                    { type: 'Unconditional bifurcation', clk_cycles: 0, percentage: 0},
+                  ];
 /*Keyboard*/
 var keyboard = '' ;
 /*Display*/
@@ -655,7 +656,7 @@ function assembly_compiler()
           {
             if (signatureParts[j] == "inm-signed" || signatureParts[j] == "inm-unsigned" || signatureParts[j] == "address")
             {
-              for (var z = 0; z < instructions.length && exit == 0; z++)
+              for (var z = 0; z < instructions.length && exit === 0; z++)
               {
                 if (instructions[z].Label == instructionParts[j])
                 {
@@ -741,7 +742,7 @@ function assembly_compiler()
                 }
               }
 
-              if (exit == 0 && isNaN(instructionParts[j]) == true)
+              if (exit === 0 && isNaN(instructionParts[j]) === true)
               {
                 //tokenIndex = 0;
                 //nEnters = 0 ;
@@ -1021,7 +1022,7 @@ function assembly_compiler()
 
         /*Save binary*/
         for(var i = 0; i < instructions_binary.length; i++){
-          if(extern.length == 0 && instructions_binary[i].Label != ""){
+          if(extern.length === 0 && instructions_binary[i].Label != ""){
             instructions_binary[i].Label = instructions_binary[i].Label + "_symbol";
             instructions_binary[i].globl = false;
           }
@@ -2647,7 +2648,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if(isNaN(parseInt(token, 16)) == true){
+                  if(isNaN(parseInt(token, 16)) === true){
                     return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -2664,7 +2665,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -2709,14 +2710,14 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
                   inm = (parseInt(token, 10) >>> 0).toString(2);
                   inm = inm.substring(inm.length - fieldsLength ,inm.length);
                 }
-                if(validTagPC == true){
+                if(validTagPC === true){
                   console_log(inm.length);
                   if (inm.length > (architecture.instructions[i].fields[a].startbit - architecture.instructions[i].fields[a].stopbit + 1)) {
 
@@ -2769,7 +2770,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                   }
 
-                  if (isNaN(parseInt(token, 16)) == true) {
+                  if (isNaN(parseInt(token, 16)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -2785,7 +2786,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -2826,7 +2827,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -2867,7 +2868,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      return packCompileError('m8', token, 'error', "danger") ;
                   }
 
-                  if (isNaN(parseInt(token, 16)) == true) {
+                  if (isNaN(parseInt(token, 16)) === true) {
                       return packCompileError('m9', token, 'error', "danger") ;
                   }
 
@@ -2912,7 +2913,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                    }
 
-                   if (isNaN(parseInt(token, 16)) == true) {
+                   if (isNaN(parseInt(token, 16)) === true) {
                        return packCompileError('m6', token, 'error', "danger") ;
                    }
 
@@ -2928,7 +2929,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -2960,7 +2961,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                    }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                      return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -3009,7 +3010,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      }
                   }
 
-                  if (isNaN(parseInt(token, 16)) == true) {
+                  if (isNaN(parseInt(token, 16)) === true) {
                      return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -3025,7 +3026,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -3057,7 +3058,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                   }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -3540,7 +3541,7 @@ function pseudoinstruction_compiler ( instruction, label, line )
           var error = false;
           console_log(definition);
           eval(definition);
-          if(error == true){
+          if(error === true){
             console_log("Error pseudo");
             //return packCompileError('m13', "Error pseudoinstruction", 'error', "danger") ;
             return ret;
@@ -3621,7 +3622,7 @@ function field ( field, action, type )
     }
 
     //if (Number.isInteger(field) == false)
-    if (isNaN(field) == true)
+    if (isNaN(field) === true)
     {
       var ret = creator_memory_findaddress_bytag(field) ;
       if (ret.exit == 1) {

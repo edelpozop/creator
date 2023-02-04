@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Alejandro Calderon Mateos, Diego Camarmas Alonso
  *
@@ -145,6 +146,7 @@ function register_value_serialize( architecture )
 
   return aux_architecture;
 }
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -195,6 +197,7 @@ function register_value_serialize( architecture )
             });
     }
   }
+
 
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
@@ -464,7 +467,7 @@ function register_value_serialize( architecture )
     var print_value = value;
 
     //Add - if the number is -0.0
-    if ( bin_value != null && value == 0 && bin_value[0] == 1 ) {
+    if ( bin_value != null && value === 0 && bin_value[0] === 1 ) {
       print_value  = "-" + print_value;
     }
 
@@ -497,6 +500,7 @@ function register_value_serialize( architecture )
 
     return value2;
   }
+
 
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
@@ -679,7 +683,7 @@ function creator_callstack_leave()
     };
 
     // check params
-    if (0 == stack_call_register.length) {
+    if (0 === stack_call_register.length) {
         ret.msg = "creator_callstack_Leave: empty stack_call_register !!.\n";
         return ret;
     }
@@ -999,6 +1003,7 @@ function creator_callstack_do_transition ( doAction, indexComponent, indexElemen
                     "state '" + state + "'' to state '" + new_state + "' and action '" + action + "' is empty (warning).") ;
     }
 }
+
 
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
@@ -1429,12 +1434,12 @@ function capi_sbrk ( value1, value2 )
 	writeRegister(new_addr, ret2.indexComp, ret2.indexElem);
 }
 
-function capi_get_power_consumption ( )
+function capi_get_clk_cycles ( )
 {
 	/* Google Analytics */
-	creator_ga('execute', 'execute.syscall', 'execute.syscall.get_power_consumption');
+	creator_ga('execute', 'execute.syscall', 'execute.syscall.get_clk_cycles');
 
-	return total_power_consumption;
+	return total_clk_cycles;
 }
 
 
@@ -1579,7 +1584,8 @@ function capi_check_ieee ( s, e, m )
 function capi_float2bin ( f )
 {
 	return float2bin(f) ;
-}/*
+}
+/*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
@@ -1698,7 +1704,7 @@ function track_stack_leave()
     };
 
     // check params
-    if (0 == track_stack_limits.length)
+    if (0 === track_stack_limits.length)
     {
         ret.msg = "track_stack_Leave: empty track_stack_limits !!.\n";
         return ret;
@@ -1841,6 +1847,7 @@ function track_stack_reset()
     return ret ;
 }
 
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -1882,7 +1889,7 @@ function crex_findReg ( value1 )
   {
      for (var j = 0; j < architecture.components[i].elements.length; j++)
      {
-        if (architecture.components[i].elements[j].name.includes(value1) != false)
+        if (architecture.components[i].elements[j].name.includes(value1) !== false)
         {
           ret.match = 1;
           ret.indexComp = i;
@@ -1976,9 +1983,9 @@ function writeRegister ( value, indexComp, indexElem, register_type )
   if ((architecture.components[indexComp].type == "int_registers") ||
       (architecture.components[indexComp].type == "ctrl_registers"))
   {
-      if ((architecture.components[indexComp].elements[indexElem].properties.includes('write') != true))
+      if ((architecture.components[indexComp].elements[indexElem].properties.includes('write') !== true))
       {
-        if ((architecture.components[indexComp].elements[indexElem].properties.includes('ignore_write') != false)){
+        if ((architecture.components[indexComp].elements[indexElem].properties.includes('ignore_write') !== false)){
           return;
         }
 
@@ -1993,8 +2000,8 @@ function writeRegister ( value, indexComp, indexElem, register_type )
       architecture.components[indexComp].elements[indexElem].value = bi_intToBigInt(value,10);
       creator_callstack_writeRegister(indexComp, indexElem);
 
-      if ((architecture.components[indexComp].elements[indexElem].properties.includes('pointer') != false) &&
-          (architecture.components[indexComp].elements[indexElem].properties.includes('stack') != false)   &&
+      if ((architecture.components[indexComp].elements[indexElem].properties.includes('pointer') !== false) &&
+          (architecture.components[indexComp].elements[indexElem].properties.includes('stack') !== false)   &&
           (value != parseInt(architecture.memory_layout[4].value))) {
             writeStackLimit(parseInt(bi_intToBigInt(value,10)));
       }
@@ -2006,11 +2013,11 @@ function writeRegister ( value, indexComp, indexElem, register_type )
 
   else if (architecture.components[indexComp].type =="fp_registers")
   {
-    if (architecture.components[indexComp].double_precision == false)
+    if (architecture.components[indexComp].double_precision === false)
     {
-      if ((architecture.components[indexComp].elements[indexElem].properties.includes('write') != true))
+      if ((architecture.components[indexComp].elements[indexElem].properties.includes('write') !== true))
       {
-        if ((architecture.components[indexComp].elements[indexElem].properties.includes('ignore_write') != false)){
+        if ((architecture.components[indexComp].elements[indexElem].properties.includes('ignore_write') !== false)){
           return;
         }
         draw.danger.push(execution_index);
@@ -2022,8 +2029,8 @@ function writeRegister ( value, indexComp, indexElem, register_type )
       architecture.components[indexComp].elements[indexElem].value = bi_floatToBigInt(value);
       creator_callstack_writeRegister(indexComp, indexElem);
 
-      if ((architecture.components[indexComp].elements[indexElem].properties.includes('pointer') != false) &&
-          (architecture.components[indexComp].elements[indexElem].properties.includes('stack') != false)   &&
+      if ((architecture.components[indexComp].elements[indexElem].properties.includes('pointer') !== false) &&
+          (architecture.components[indexComp].elements[indexElem].properties.includes('stack') !== false)   &&
           (value != parseInt(architecture.memory_layout[4].value))) {
             writeStackLimit(parseFloat(value));
       }
@@ -2035,11 +2042,11 @@ function writeRegister ( value, indexComp, indexElem, register_type )
       }
     }
 
-    else if (architecture.components[indexComp].double_precision == true)
+    else if (architecture.components[indexComp].double_precision === true)
     {
-      if ((architecture.components[indexComp].elements[indexElem].properties.includes('write') != true))
+      if ((architecture.components[indexComp].elements[indexElem].properties.includes('write') !== true))
       {
-        if ((architecture.components[indexComp].elements[indexElem].properties.includes('ignore_write') != false)){
+        if ((architecture.components[indexComp].elements[indexElem].properties.includes('ignore_write') !== false)){
           return;
         }
         draw.danger.push(execution_index);
@@ -2080,18 +2087,18 @@ function updateDouble(comp, elem)
 {
   for (var i = 0; i < architecture.components.length; i++)
   {
-    if (architecture.components[i].double_precision == true && architecture.components[i].double_precision_type == "linked")
+    if (architecture.components[i].double_precision === true && architecture.components[i].double_precision_type == "linked")
     {
       for (var j = 0; j < architecture.components[i].elements.length; j++)
       {
-        if (architecture.components[comp].elements[elem].name.includes(architecture.components[i].elements[j].simple_reg[0]) != false){
+        if (architecture.components[comp].elements[elem].name.includes(architecture.components[i].elements[j].simple_reg[0]) !== false){
           var simple = bin2hex(float2bin(readRegister(comp, elem)));
           var double = bin2hex(double2bin(readRegister(i, j))).substr(8, 15);
           var newDouble = simple + double;
 
           architecture.components[i].elements[j].value = bi_doubleToBigInt(hex2double("0x"+newDouble));
         }
-        if (architecture.components[comp].elements[elem].name.includes(architecture.components[i].elements[j].simple_reg[1]) != false){
+        if (architecture.components[comp].elements[elem].name.includes(architecture.components[i].elements[j].simple_reg[1]) !== false){
           var simple = bin2hex(float2bin(readRegister(comp, elem)));
           var double = bin2hex(double2bin(readRegister(i, j))).substr(0, 8);
           var newDouble = double + simple;
@@ -2115,16 +2122,17 @@ function updateSimple ( comp, elem )
     {
       for (var j = 0; j < architecture.components[i].elements.length; j++)
       {
-        if (architecture.components[i].elements[j].name.includes(architecture.components[comp].elements[elem].simple_reg[0]) != false) {
+        if (architecture.components[i].elements[j].name.includes(architecture.components[comp].elements[elem].simple_reg[0]) !== false) {
           architecture.components[i].elements[j].value = bi_floatToBigInt(hex2float("0x"+part1));
         }
-        if (architecture.components[i].elements[j].name.includes(architecture.components[comp].elements[elem].simple_reg[1]) != false) {
+        if (architecture.components[i].elements[j].name.includes(architecture.components[comp].elements[elem].simple_reg[1]) !== false) {
           architecture.components[i].elements[j].value = bi_floatToBigInt(hex2float("0x"+part2));
         }
       }
     }
   }
-}/*
+}
+/*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.
@@ -2978,7 +2986,7 @@ function creator_memory_is_segment_empty ( segment_name )
                                          return creator_memory_is_address_inside_segment(segment_name, elto) ;
                                       });
 
-          return (insiders.length == 0) ;
+          return (insiders.length === 0) ;
 }
 
 
@@ -3027,6 +3035,7 @@ function creator_memory_storestring ( string, string_length, data_address, label
 
         return main_memory_storedata(data_address, string, string_length, label, string, string, type) + 1;
 }
+
 
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
@@ -3160,42 +3169,42 @@ var load_binary = false;
 var totalStats = 0;
 var stats_value = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 var stats = [
-  { type: 'Arithmetic floating point', number_instructions: 0, percentage: 0 },
-  { type: 'Arithmetic integer', number_instructions: 0, percentage: 0},
-  { type: 'Comparison', number_instructions: 0, percentage: 0 },
-  { type: 'Conditional bifurcation', number_instructions: 0, percentage: 0},
-  { type: 'Control', number_instructions: 0, percentage: 0},
-  { type: 'Function call', number_instructions: 0, percentage: 0},
-  { type: 'I/O', number_instructions: 0, percentage: 0},
-  { type: 'Logic', number_instructions: 0, percentage: 0, abbreviation: "Log"},
-  { type: 'Memory access', number_instructions: 0, percentage: 0},
-  { type: 'Other', number_instructions: 0, percentage: 0},
-  { type: 'Syscall', number_instructions: 0, percentage: 0},
-  { type: 'Transfer between registers', number_instructions: 0, percentage: 0},
-  { type: 'Unconditional bifurcation', number_instructions: 0, percentage: 0},
-];
-/*Power consumption*/
-var total_power_consumption = 0;
-var power_consumption_value = [
-                                {
-                                  data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                                }
-                              ];
-var power_consumption = [
-  { type: 'Arithmetic floating point', power_consumption: 0, percentage: 0 },
-  { type: 'Arithmetic integer', power_consumption: 0, percentage: 0},
-  { type: 'Comparison', power_consumption: 0, percentage: 0 },
-  { type: 'Conditional bifurcation', power_consumption: 0, percentage: 0},
-  { type: 'Control', power_consumption: 0, percentage: 0},
-  { type: 'Function call', power_consumption: 0, percentage: 0},
-  { type: 'I/O', power_consumption: 0, percentage: 0},
-  { type: 'Logic', power_consumption: 0, percentage: 0, abbreviation: "Log"},
-  { type: 'Memory access', power_consumption: 0, percentage: 0},
-  { type: 'Other', power_consumption: 0, percentage: 0},
-  { type: 'Syscall', power_consumption: 0, percentage: 0},
-  { type: 'Transfer between registers', power_consumption: 0, percentage: 0},
-  { type: 'Unconditional bifurcation', power_consumption: 0, percentage: 0},
-];
+              { type: 'Arithmetic floating point', number_instructions: 0, percentage: 0 },
+              { type: 'Arithmetic integer', number_instructions: 0, percentage: 0},
+              { type: 'Comparison', number_instructions: 0, percentage: 0 },
+              { type: 'Conditional bifurcation', number_instructions: 0, percentage: 0},
+              { type: 'Control', number_instructions: 0, percentage: 0},
+              { type: 'Function call', number_instructions: 0, percentage: 0},
+              { type: 'I/O', number_instructions: 0, percentage: 0},
+              { type: 'Logic', number_instructions: 0, percentage: 0, abbreviation: "Log"},
+              { type: 'Memory access', number_instructions: 0, percentage: 0},
+              { type: 'Other', number_instructions: 0, percentage: 0},
+              { type: 'Syscall', number_instructions: 0, percentage: 0},
+              { type: 'Transfer between registers', number_instructions: 0, percentage: 0},
+              { type: 'Unconditional bifurcation', number_instructions: 0, percentage: 0},
+            ];
+/*CLK Cycles*/
+var total_clk_cycles = 0;
+var clk_cycles_value =  [
+                          {
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                          }
+                        ];
+var clk_cycles =  [
+                    { type: 'Arithmetic floating point', clk_cycles: 0, percentage: 0 },
+                    { type: 'Arithmetic integer', clk_cycles: 0, percentage: 0},
+                    { type: 'Comparison', clk_cycles: 0, percentage: 0 },
+                    { type: 'Conditional bifurcation', clk_cycles: 0, percentage: 0},
+                    { type: 'Control', clk_cycles: 0, percentage: 0},
+                    { type: 'Function call', clk_cycles: 0, percentage: 0},
+                    { type: 'I/O', clk_cycles: 0, percentage: 0},
+                    { type: 'Logic', clk_cycles: 0, percentage: 0, abbreviation: "Log"},
+                    { type: 'Memory access', clk_cycles: 0, percentage: 0},
+                    { type: 'Other', clk_cycles: 0, percentage: 0},
+                    { type: 'Syscall', clk_cycles: 0, percentage: 0},
+                    { type: 'Transfer between registers', clk_cycles: 0, percentage: 0},
+                    { type: 'Unconditional bifurcation', clk_cycles: 0, percentage: 0},
+                  ];
 /*Keyboard*/
 var keyboard = '' ;
 /*Display*/
@@ -3685,7 +3694,7 @@ function assembly_compiler()
           {
             if (signatureParts[j] == "inm-signed" || signatureParts[j] == "inm-unsigned" || signatureParts[j] == "address")
             {
-              for (var z = 0; z < instructions.length && exit == 0; z++)
+              for (var z = 0; z < instructions.length && exit === 0; z++)
               {
                 if (instructions[z].Label == instructionParts[j])
                 {
@@ -3771,7 +3780,7 @@ function assembly_compiler()
                 }
               }
 
-              if (exit == 0 && isNaN(instructionParts[j]) == true)
+              if (exit === 0 && isNaN(instructionParts[j]) === true)
               {
                 //tokenIndex = 0;
                 //nEnters = 0 ;
@@ -4051,7 +4060,7 @@ function assembly_compiler()
 
         /*Save binary*/
         for(var i = 0; i < instructions_binary.length; i++){
-          if(extern.length == 0 && instructions_binary[i].Label != ""){
+          if(extern.length === 0 && instructions_binary[i].Label != ""){
             instructions_binary[i].Label = instructions_binary[i].Label + "_symbol";
             instructions_binary[i].globl = false;
           }
@@ -5677,7 +5686,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if(isNaN(parseInt(token, 16)) == true){
+                  if(isNaN(parseInt(token, 16)) === true){
                     return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -5694,7 +5703,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -5739,14 +5748,14 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
                   inm = (parseInt(token, 10) >>> 0).toString(2);
                   inm = inm.substring(inm.length - fieldsLength ,inm.length);
                 }
-                if(validTagPC == true){
+                if(validTagPC === true){
                   console_log(inm.length);
                   if (inm.length > (architecture.instructions[i].fields[a].startbit - architecture.instructions[i].fields[a].stopbit + 1)) {
 
@@ -5799,7 +5808,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                   }
 
-                  if (isNaN(parseInt(token, 16)) == true) {
+                  if (isNaN(parseInt(token, 16)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -5815,7 +5824,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -5856,7 +5865,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                     }
                   }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -5897,7 +5906,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      return packCompileError('m8', token, 'error', "danger") ;
                   }
 
-                  if (isNaN(parseInt(token, 16)) == true) {
+                  if (isNaN(parseInt(token, 16)) === true) {
                       return packCompileError('m9', token, 'error', "danger") ;
                   }
 
@@ -5942,7 +5951,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                    }
 
-                   if (isNaN(parseInt(token, 16)) == true) {
+                   if (isNaN(parseInt(token, 16)) === true) {
                        return packCompileError('m6', token, 'error', "danger") ;
                    }
 
@@ -5958,7 +5967,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -5990,7 +5999,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                    }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                      return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -6039,7 +6048,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      }
                   }
 
-                  if (isNaN(parseInt(token, 16)) == true) {
+                  if (isNaN(parseInt(token, 16)) === true) {
                      return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -6055,7 +6064,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                      }
                   }
 
-                  if (isNaN(parseFloat(token)) == true) {
+                  if (isNaN(parseFloat(token)) === true) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -6087,7 +6096,7 @@ function instruction_compiler ( instruction, userInstruction, label, line,
                       }
                   }
 
-                  if (isNaN(parseInt(token)) == true && resultPseudo == -3) {
+                  if (isNaN(parseInt(token)) === true && resultPseudo == -3) {
                       return packCompileError('m6', token, 'error', "danger") ;
                   }
 
@@ -6570,7 +6579,7 @@ function pseudoinstruction_compiler ( instruction, label, line )
           var error = false;
           console_log(definition);
           eval(definition);
-          if(error == true){
+          if(error === true){
             console_log("Error pseudo");
             //return packCompileError('m13', "Error pseudoinstruction", 'error', "danger") ;
             return ret;
@@ -6651,7 +6660,7 @@ function field ( field, action, type )
     }
 
     //if (Number.isInteger(field) == false)
-    if (isNaN(field) == true)
+    if (isNaN(field) === true)
     {
       var ret = creator_memory_findaddress_bytag(field) ;
       if (ret.exit == 1) {
@@ -6747,6 +6756,7 @@ function binaryStringToInt( b ) {
     return parseInt(b, 2);
 }
 
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -6821,12 +6831,12 @@ function execute_instruction ( )
     if (execution_index == -1) {
       return packExecute(true, 'The program has finished with errors', 'danger', null);
     }
-    else if (mutex_read == true) {
+    else if (mutex_read === true) {
       return packExecute(false, '', 'info', null);
     }
 
     //Search a main tag
-    if (execution_init == 1)
+    if (execution_init === 1)
     {
       for (var i = 0; i < instructions.length; i++)
       {
@@ -6965,7 +6975,7 @@ function execute_instruction ( )
                 var bin = "";
 
                 //Get binary
-                if(architecture.instructions[i].separated && architecture.instructions[i].separated[f] == true){
+                if(architecture.instructions[i].separated && architecture.instructions[i].separated[f] === true){
                   for (var sep_index = 0; sep_index < architecture.instructions[i].fields[f].startbit.length; sep_index++) {
                     bin = bin + instructionExec.substring(((instruction_nwords*31) - instruction_fields[f].startbit[sep_index]), ((instruction_nwords*32) - instruction_fields[f].stopbit[sep_index]))
                   }
@@ -7179,7 +7189,7 @@ function execute_instruction ( )
     stats_update(type) ;
 
     // Refresh power consumption
-    power_consumtion_update(type) ;
+    clk_cycles_update(type) ;
 
     // Execution error
     if (execution_index == -1){
@@ -7188,7 +7198,7 @@ function execute_instruction ( )
     }
 
     // Next instruction to execute
-    if (error != 1 && execution_index < instructions.length)
+    if (error !== 1 && execution_index < instructions.length)
     {
       for (var i = 0; i < instructions.length; i++)
       {
@@ -7198,7 +7208,7 @@ function execute_instruction ( )
           draw.success.push(execution_index) ;
           break;
         }
-        else if (i == instructions.length-1 && mutex_read == true){
+        else if (i == instructions.length-1 && mutex_read === true){
           execution_index = instructions.length+1;
         }
         else if (i == instructions.length-1){
@@ -7208,7 +7218,7 @@ function execute_instruction ( )
       }
     }
 
-    if (execution_index >= instructions.length && mutex_read == true)
+    if (execution_index >= instructions.length && mutex_read === true)
     {
       for (var i = 0; i < instructions.length; i++) {
         draw.space.push(i);
@@ -7226,13 +7236,13 @@ function execute_instruction ( )
       return packExecute(false, 'The execution of the program has finished', 'success', draw);
     }
     else{
-      if (error != 1) {
+      if (error !== 1) {
         draw.success.push(execution_index);
       }
     }
     console_log(execution_index) ;
   }
-  while(instructions[execution_index].hide == true) ;
+  while(instructions[execution_index].hide ===true) ;
 
   return packExecute(false, null, null, draw) ;
 }
@@ -7287,7 +7297,7 @@ function reset ()
   stats_reset();
 
   //Power consumption reset
-  power_consumtion_reset();
+  clk_cycles_reset();
 
   // Reset console
   mutex_read    = false ;
@@ -7299,7 +7309,7 @@ function reset ()
   {
     for (var j = 0; j < architecture.components[i].elements.length; j++)
     {
-      if (architecture.components[i].double_precision == false || (architecture.components[i].double_precision == true && architecture.components[i].double_precision_type == "extended"))
+      if (architecture.components[i].double_precision === false || (architecture.components[i].double_precision === true && architecture.components[i].double_precision_type == "extended"))
       {
         architecture.components[i].elements[j].value = architecture.components[i].elements[j].default_value;
       }
@@ -7433,63 +7443,61 @@ function stats_reset ( )
 
 
 /*
- * Power consumption
+ * CLK Cycles
  */
 
-function power_consumtion_update ( type )
+function clk_cycles_update ( type )
 {
-  for (var i = 0; i < power_consumption.length; i++)
+  for (var i = 0; i < clk_cycles.length; i++)
   {
-    if (type == power_consumption[i].type)
+    if (type == clk_cycles[i].type)
     {
-      power_consumption[i].power_consumption++;
+      clk_cycles[i].clk_cycles++;
 
-      //Update power consumption plot
+      //Update CLK Cycles plot
       if (typeof app !== "undefined") {
-        const aux_power_consumption_value = structuredClone(power_consumption_value[0].data);
-        aux_power_consumption_value[i] ++;
-        power_consumption_value = [{data: aux_power_consumption_value}];
-        app._data.power_consumption_value = power_consumption_value;
+        const aux_clk_cycles_value = structuredClone(clk_cycles_value[0].data);
+        aux_clk_cycles_value[i] ++;
+        clk_cycles_value = [{data: aux_clk_cycles_value}];
+        app._data.clk_cycles_value = clk_cycles_value;
       }
       else{
-        power_consumption_value[0].data[i] ++;
+        clk_cycles_value[0].data[i] ++;
       }
       
-      total_power_consumption++;
+      total_clk_cycles++;
       if (typeof app !== "undefined") {
-        app._data.total_power_consumption++;
+        app._data.total_clk_cycles++;
       }
     }
   }
 
-  //Power Consumptiom
+  //CLK Cycles
   for (var i = 0; i < stats.length; i++){
-    power_consumption[i].percentage = ((power_consumption[i].power_consumption/total_power_consumption)*100).toFixed(2);
+    clk_cycles[i].percentage = ((clk_cycles[i].clk_cycles/total_clk_cycles)*100).toFixed(2);
   }
 }
 
-function power_consumtion_reset ( )
+function clk_cycles_reset ( )
 {
-  total_power_consumption = 0 ;
+  total_clk_cycles = 0 ;
   if (typeof app !== "undefined") {
-    app._data.total_power_consumption = 0 ;
+    app._data.total_clk_cycles = 0 ;
   }
 
-  for (var i = 0; i < power_consumption.length; i++)
+  for (var i = 0; i < clk_cycles.length; i++)
   {
-    power_consumption[i].percentage = 0;
+    clk_cycles[i].percentage = 0;
 
-    power_consumption[i].number_instructions = 0;
-
-    //Update power consumption plot
+    //Update CLK Cycles plot
     if (typeof app !== "undefined") {
-      const aux_power_consumption_value = structuredClone(power_consumption_value[0].data);
-      aux_power_consumption_value[i] = 0;
-      power_consumption_value = [{data: aux_power_consumption_value}];
-      app._data.power_consumption_value = power_consumption_value;
+      const aux_clk_cycles_value = structuredClone(clk_cycles_value[0].data);
+      aux_clk_cycles_value[i] = 0;
+      clk_cycles_value = [{data: aux_clk_cycles_value}];
+      app._data.clk_cycles_value = clk_cycles_value;
     }
     else{
-      power_consumption_value[0].data[i] ++;
+      clk_cycles_value[0].data[i] ++;
     }
   }
 }
@@ -7658,7 +7666,8 @@ function get_register_binary (type, bin)
 function get_number_binary (bin)
 {
   return "0x" + bin2hex(bin);
-}/*
+}
+/*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
  *  This file is part of CREATOR.

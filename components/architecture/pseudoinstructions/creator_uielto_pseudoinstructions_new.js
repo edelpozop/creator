@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -272,7 +273,7 @@
                                       if(instruction_parts[z].match(/^0x/))
                                       {
                                         var value = instruction_parts[z].split("x");
-                                        if (isNaN(parseInt(instruction_parts[z], 16)) == true)
+                                        if (isNaN(parseInt(instruction_parts[z], 16)) === true)
                                         {
                                           show_notification("Immediate number " + instruction_parts[z] + " is not valid", 'danger') ;
                                           return -1;

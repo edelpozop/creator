@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -64,7 +65,7 @@
                         this.save_assembly = '';
 
                         //Google Analytics
-                        creator_ga('assembly', 'assebly.save', 'assebly.save');
+                        creator_ga('assembly', 'assembly.save', 'assembly.save');
                       },
 
                       //Stop user interface refresh

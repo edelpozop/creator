@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -271,7 +272,7 @@
                           }
 
                           //Reset graphic
-                          if(reset_graphic == true && app._data.data_mode == "stats"){
+                          if(reset_graphic === true && app._data.data_mode == "stats"){
                             ApexCharts.exec('graphic', 'updateSeries', stats_value);
                           }
 
@@ -386,7 +387,7 @@
                             run_program=false;
                             return;
                           }
-                          else if(this.run_execution == true)
+                          else if(this.run_execution === true)
                           {
                             app._data.run_execution = false;
                             iter1 = 1;

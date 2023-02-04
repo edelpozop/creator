@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Diego Camarmas Alonso, Alejandro Calderon Mateos
  *
@@ -72,7 +73,7 @@
                         }
 
                         //Verify empty fields
-                        if (!this._props.pseudoinstruction.name || !this._props.pseudoinstruction.nwords || !this._props.pseudoinstruction.signature_definition || !this._props.pseudoinstruction.definition || empty == 1) {
+                        if (!this._props.pseudoinstruction.name || !this._props.pseudoinstruction.nwords || !this._props.pseudoinstruction.signature_definition || !this._props.pseudoinstruction.definition || empty === 1) {
                           show_notification('Please complete all fields', 'danger');
                           return;
                         }
