@@ -124,7 +124,6 @@
 
           <!-- Configuration modal -->
           <form-configuration id="configuration"
-                              :instructions_packed="instructions_packed"
                               :stack_total_list="stack_total_list" 
                               :autoscroll="autoscroll"
                               :instruction_help_size="instruction_help_size"
@@ -639,7 +638,8 @@
                             :track_stack_names="track_stack_names" 
                             :callee_subrutine="callee_subrutine" 
                             :caller_subrutine="caller_subrutine"
-                            :stack_total_list="stack_total_list"
+                            :stack_total_list="stack_total_list" 
+                            :main_memory_busy="main_memory_busy"
                             v-if="data_mode == 'memory'">
                     </memory>
 

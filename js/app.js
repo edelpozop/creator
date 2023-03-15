@@ -289,15 +289,6 @@ try
       // Execution
       //
 
-      //Run instructions
-      instructions_packed: 20,
-
-      //Run button
-      run_execution: false,
-
-      //Reset button
-      resetBut: false,
-
       //Instructions
       instructions: instructions,
 
@@ -313,6 +304,7 @@ try
       //
 
       main_memory: {},
+      main_memory_busy: false,
 
       //Stack
       track_stack_names: track_stack_names,
@@ -350,7 +342,7 @@ try
 
       display: '',
       keyboard: '',
-      enter: null,
+      enter: null, // Draw text area border in read
     },
 
 

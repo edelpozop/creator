@@ -29,7 +29,7 @@
   function creator_ga ( category, action, label )
   {
     if (typeof ga !== "undefined") {
-      if (is_ga_initialize == false)
+      if (is_ga_initialize === false)
       {
         ga('create', 'UA-186823627-2', 'auto') ;
         ga('set', 'transport', 'beacon') ;
@@ -40,11 +40,11 @@
     }
 
     if (typeof gtag !== "undefined") {
-
       gtag('event',
-            action,
+            label,
             {
               'event_category' : "creator_"+category,
+              'event_action' : action,
               'event_label' : label
             });
     }
