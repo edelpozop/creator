@@ -1,6 +1,4 @@
 
-
-
 /*
  *  Copyright 2018-2023 Felix Garcia Carballeira, Alejandro Calderon Mateos, Diego Camarmas Alonso
  *
@@ -23,7 +21,6 @@
 
 
 /*General*/
-var toHandler = null;
 
 
 /****************
@@ -86,6 +83,9 @@ try
       //
 
       //Stack total list values
+      default_architecture: "none",
+
+      //Stack total list values
       stack_total_list: 40,
 
       //Notification speed
@@ -123,13 +123,6 @@ try
 
       //Delete architecture modal 
       modal_delete_arch_index: 0, //TODO: include into delete architecture component - modal info
-
-
-      //
-      //Backup 
-      //
-
-      backup_date: '', //TODO: include into backup component - modal info
 
 
 
@@ -344,6 +337,16 @@ try
       display: '',
       keyboard: '',
       enter: null, // Draw text area border in read
+
+      //
+      //Flash
+      //
+
+      target_ports: { Win: 'COM1', Mac: '/dev/cu.usbserial-210', Linux: '/dev/ttyUSB0' }, //TODO: include into flash component - modal info
+      target_board: "esp32c3", //TODO: include into flash component - modal info
+      target_port: "", //TODO: include into flash component - modal info
+      flash_url: "http://localhost:8080", //TODO: include into flash component - modal info
+
     },
 
 
@@ -357,7 +360,7 @@ try
       uielto_preload_architecture.methods.load_arch_available();
       this.detect_os();
       this.detect_browser();
-      
+      this.get_target_port();
     },
 
 
@@ -366,7 +369,7 @@ try
      ************************/
     mounted(){
       this.validate_browser();
-      this.backup_modal();
+      uielto_backup.methods.backup_modal(this);
 
       //Pre-load following URL params
       var url_hash = creator_preload_get2hash(window.location) ;
@@ -456,23 +459,6 @@ try
 
 
 
-      /*************************/
-      /* Architecture Selector */
-      /*************************/
-
-      //Show backup modal
-      backup_modal(){
-        if (typeof(Storage) !== "undefined"){
-          if(localStorage.getItem("backup_arch") != null && localStorage.getItem("backup_asm") != null && localStorage.getItem("backup_date") != null){
-            this.backup_date = localStorage.getItem("backup_date");
-            this.$root.$emit('bv::show::modal', 'copy');
-          }
-        }
-      },
-
-
-
-
       /*************/
       /* Simulator */
       /*************/
@@ -493,6 +479,12 @@ try
 
         return;
       },
+
+      //Get target por by SO
+      get_target_port()
+      {
+        this.target_port = this.target_ports[this.os];
+      },
     },
   });
 
@@ -505,10 +497,10 @@ try
 
   //Error handler
   Vue.config.errorHandler = function (err, vm, info) {
-      show_notification('An error has ocurred, the simulator is going to restart.  \n Error: ' + err, 'danger') ;
-      setTimeout(function(){
-        location.reload(true)
-      }, 3000);
+    show_notification('An error has ocurred, the simulator is going to restart.  \n Error: ' + err, 'danger') ;
+    setTimeout(function(){
+      location.reload(true)
+    }, 3000);
   }
 
   /*Closing alert*/

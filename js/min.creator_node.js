@@ -161,17 +161,6 @@ function register_value_serialize( architecture )
 
   function creator_ga ( category, action, label )
   {
-    if (typeof ga !== "undefined") {
-      if (is_ga_initialize === false)
-      {
-        ga('create', 'UA-186823627-2', 'auto') ;
-        ga('set', 'transport', 'beacon') ;
-        is_ga_initialize = true ;
-      }
-
-      ga('send', 'event', category, action, label) ;
-    }
-
     if (typeof gtag !== "undefined") {
       gtag('event',
             label,
@@ -1408,7 +1397,7 @@ function capi_callconv_begin ( addr )
 	var function_name = "" ;
 
 	// 1) Passing Convection enable?
-	if (architecture.arch_conf[5].value === 0) {
+	if (architecture.arch_conf[6].value === 0) {
 		return;
 	}
 
@@ -1427,7 +1416,7 @@ function capi_callconv_begin ( addr )
 function capi_callconv_end ()
 {
 	// 1) Passing Convection enable?
-	if (architecture.arch_conf[5].value === 0) {
+	if (architecture.arch_conf[6].value === 0) {
 		return;
 	}
 
@@ -3032,7 +3021,7 @@ function creator_memory_storestring ( string, string_length, data_address, label
             data_tag.push({tag: label, addr: data_address});
         }
 
-        return main_memory_storedata(data_address, string, string_length, label, string, string, type) + 1;
+        return main_memory_storedata(data_address, string, string_length, label, string, string, type);
 }
 
 
@@ -3502,8 +3491,7 @@ function assembly_compiler()
         /*Start of compilation*/
         first_token();
         if (get_token() == null) {
-            hide_loading();
-            return packCompileError('m0', 'Please enter the assembly code before compiling', 'warning', 'danger') ;
+          return packCompileError('m0', 'Please enter the assembly code before compiling', 'warning', 'danger') ;
         }
 
         token = get_token();
@@ -4774,7 +4762,7 @@ function data_segment_compiler()
                       return packCompileError('m17', "", 'error', "danger") ;
                     }
 
-                    data_address = creator_memory_storestring(string, string.length, data_address, label, "asciiz", align);
+                    data_address = creator_memory_storestring(string, string.length, data_address, label, "asciiz", align) + 1;
 
                     console_log("ascii_null_end Terminado");
 
@@ -6799,7 +6787,7 @@ function execute_instruction ( )
     {
       for (var i = 0; i < instructions.length; i++)
       {
-        if (instructions[i].Label == architecture.arch_conf[4].value) {
+        if (instructions[i].Label == architecture.arch_conf[5].value) {
           //draw.success.push(execution_index) ;
           //architecture.components[0].elements[0].value = bi_intToBigInt(instructions[i].Address, 10); //TODO
           writeRegister(bi_intToBigInt(instructions[i].Address, 10), 0, 0);
@@ -6808,7 +6796,7 @@ function execute_instruction ( )
         }
         else if (i == instructions.length-1) {
           execution_index = -1;
-          return packExecute(true, 'Label "'+ architecture.arch_conf[4].value +'" not found', 'danger', null);
+          return packExecute(true, 'Label "'+ architecture.arch_conf[5].value +'" not found', 'danger', null);
         }
       }
     }
