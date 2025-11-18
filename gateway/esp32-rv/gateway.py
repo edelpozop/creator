@@ -36,6 +36,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 BUILD_PATH = '.' 
 process_holder = {}
 
+
 #### (*) Cleaning functions
 def do_fullclean_request(request):
   """ Full clean the build directory """
@@ -81,7 +82,6 @@ def do_stop_monitor_request(request):
     if error == 0:
       req_data['status'] += 'Process stopped\n' 
     
-
   except Exception as e:
     req_data['status'] += str(e) + '\n'
 
@@ -151,7 +151,6 @@ def do_cmd(req_data, cmd_array):
 
   return req_data['error']
 
-
 def do_cmd_output(req_data, cmd_array):
   try:
     result = subprocess.run(cmd_array, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=60)
@@ -197,12 +196,12 @@ def do_flash_request(request):
       req_data['status'] += 'Error adapting assembly file...\n'
 
     # flashing steps...
-    if error == 0 :
-      error = check_uart_connection(target_device)
-    if error != 0:
-      req_data['status'] += 'No UART port found.\n'
-      logging.error("No UART port found.")
-      raise  Exception("No UART port found")
+    # if error == 0 :
+    #   error = check_uart_connection(target_device)
+    # if error != 0:
+    #   req_data['status'] += 'No UART port found.\n'
+    #   logging.error("No UART port found.")
+    #   raise  Exception("No UART port found")
     if error == 0:
       error = do_cmd(req_data, ['idf.py',  'fullclean'])
     # Disable memory protection
@@ -217,7 +216,7 @@ def do_flash_request(request):
               "# CONFIG_ESP_SYSTEM_MEMPROT_FEATURE_LOCK is not set\n" 
           )
     #TODO: Add other boards here...
-    elif target_board == 'esp32c6': 
+    elif target_board == 'esp32c6' or target_board == 'esp32h2': 
           with open(defaults_path, "w") as f:
               f.write(
                   "CONFIG_FREERTOS_HZ=1000\n"
@@ -239,7 +238,7 @@ def do_flash_request(request):
             r'/^CONFIG_ESP_SYSTEM_MEMPROT_FEATURE_LOCK=/c\# CONFIG_ESP_SYSTEM_MEMPROT_FEATURE_LOCK is not set',
             sdkconfig_path
         ])
-      elif target_board == 'esp32c6':
+      elif target_board == 'esp32c6' or target_board == 'esp32h2':
             #CONFIG_FREERTOS_HZ=1000
             do_cmd(req_data, [
                 'sed', '-i',
@@ -287,7 +286,7 @@ def do_monitor_request(request):
 
     build_root = BUILD_PATH +'/build'
     error = 0
-    error = check_uart_connection(target_device)
+    # error = check_uart_connection(target_device)
     if error != 0:
       logging.info("No UART found")
       req_data['status'] += "No UART port found\n"
@@ -443,7 +442,6 @@ def kill_all_processes(process_name):
         logging.error(f"Ocurrió un error inesperado: {e}")
         return 1
 
-    
 # (4.3) OpenOCD Function
 def start_openocd_thread(req_data):
     target_board = req_data['target_board']
@@ -462,8 +460,10 @@ def start_openocd_thread(req_data):
         req_data['status'] += f"Error starting OpenOCD: {str(e)}\n"
         logging.error(f"Error starting OpenOCD: {str(e)}")
         return None
+
 # (4.4) GDBGUI function    
 def start_gdbgui(req_data):
+    target_device      = req_data['target_port']
     route = os.path.join(BUILD_PATH, 'gdbinit')
     logging.debug(f"GDB route: {route}")
     route = os.path.join(BUILD_PATH, 'gdbinit')
@@ -474,9 +474,9 @@ def start_gdbgui(req_data):
         req_data['status'] += f"GDB route: {route} does not exist.\n"
         return jsonify(req_data)
     req_data['status'] = ''
-    if check_uart_connection():
-      req_data['status'] += f"No UART found\n"
-      return jsonify(req_data)
+    # if check_uart_connection(target_device) != 0:
+    #   req_data['status'] += f"No UART found\n"
+    #   return jsonify(req_data)
     
     logging.info("Starting GDBGUI...")
     gdbgui_cmd = ['idf.py', '-C', BUILD_PATH, 'gdbgui', '--gdbinit', route, 'monitor']
@@ -503,8 +503,6 @@ def start_gdbgui(req_data):
     req_data['status'] += f"Finished debug session: {e}\n"
     return jsonify(req_data)
           
-
-
 def do_debug_request(request):
     global stop_event
     global process_holder
@@ -529,13 +527,13 @@ def do_debug_request(request):
                 kill_all_processes("openocd")
                 process_holder.pop('openocd', None)
             # Check UART
-            if  check_uart_connection():
-                req_data['status'] += f"No UART found\n"
-                return jsonify(req_data)    
+            # if  check_uart_connection(target_device) != 0:
+            #     req_data['status'] += f"No UART found\n"
+            #     return jsonify(req_data)    
             # Check if JTAG is connected
-            if not check_jtag_connection():
-                req_data['status'] += "No JTAG found\n"
-                return jsonify(req_data)
+            # if not check_jtag_connection():
+            #     req_data['status'] += "No JTAG found\n"
+            #     return jsonify(req_data)
 
             # Start OpenOCD
             logging.info("Starting OpenOCD...")
@@ -558,6 +556,48 @@ def do_debug_request(request):
         logging.error(f"Exception in do_debug_request: {e}")
 
     return jsonify(req_data)
+
+
+# (5) Flasing assembly program into target board
+def do_job_request(request):
+  try:
+    req_data = request.get_json()
+    target_device      = req_data['target_port']
+    target_board       = req_data['target_board']
+    asm_code           = req_data['assembly']
+    req_data['status'] = ''
+
+    # create temporal assembly file
+    text_file = open("tmp_assembly.s", "w")
+    ret = text_file.write(asm_code)
+    text_file.close()
+
+    # transform th temporal assembly file
+    error = creator_build('tmp_assembly.s', "main/program.s");
+    if error != 0:
+        req_data['status'] += 'Error adapting assembly file...\n'
+
+    # flashing steps...
+    if error == 0:
+      error = do_cmd_output(req_data, ['idf.py',  'fullclean'])
+    if error == 0:
+      error = do_cmd_output(req_data, ['idf.py',  'set-target', target_board])
+    if error == 0:
+      error = do_cmd_output(req_data, ['idf.py', 'build'])
+    if error == 0:
+      error = do_cmd_output(req_data, ['idf.py', '-p', target_device, 'flash'])
+    if error == 0:
+      error = do_cmd_output(req_data, ['./gateway_monitor.sh', target_device, '50'])
+      error = do_cmd_output(req_data, ['cat', 'monitor_output.txt'])
+      error = do_cmd_output(req_data, ['rm', 'monitor_output.txt'])
+
+  except Exception as e:
+    req_data['status'] += str(e) + '\n'
+
+  return jsonify(req_data)
+
+
+
 
 
 # Setup flask and cors:
@@ -588,7 +628,6 @@ def post_flash():
 def post_monitor():
   return do_monitor_request(request)
 
-
 # (4) POST /fullclean -> clean build directory
 @app.route("/fullclean", methods=["POST"])
 @cross_origin()
@@ -612,6 +651,12 @@ def post_debug():
 @cross_origin()
 def post_stop_monitor():
   return do_stop_monitor_request(request)
+
+# (8) POST /job -> flash + monitor
+@app.route("/job", methods=["POST"])
+@cross_origin()
+def post_job():
+  return do_job_request(request)
 
 
 # Run
