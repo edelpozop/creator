@@ -39,9 +39,10 @@
   
   |                              | URL                                             |
   |:----------------------------:|:-----------------------------------------------:|
-  | :clipboard:Source Code       | https://github.com/creatorsim/creator           |
+  | :clipboard: Source Code      | https://github.com/creatorsim/creator           |
   | :hammer: Assembler           | https://github.com/creatorsim/creator-assembler |
   | :microscope: Nightly Build   | https://github.com/creatorsim/creator-beta      |
+  | :memo: Checker               | https://github.com/creatorsim/creator-checker   |
   
   <h3 align="center">Supported Internet Browsers</h3>
   
@@ -119,6 +120,27 @@
 ### 2026
 
 <details>
+<summary>:newspaper: CREATOR: An integrated development environment for programming assembly in RISC-V architectures</summary>
+
+  * Journal paper: SoftwareX
+  * Authors: Diego Camarmas-Alonso, Félix García-Carballeira, Alejandro Calderón-Mateos, Elías Del-Pozo-Puñal, Juan Carlos Cano-Resa, Elisa Utrilla-Arroyo
+  * [:link: Open publication](https://doi.org/10.1016/j.softx.2026.102792)
+  ```bibtex
+  @article{CAMARMASALONSO2026102792,
+  	title = {CREATOR: An integrated development environment for programming assembly in RISC-V architectures},
+  	journal = {SoftwareX},
+  	volume = {35},
+  	pages = {102792},
+  	year = {2026},
+  	issn = {2352-7110},
+  	doi = {https://doi.org/10.1016/j.softx.2026.102792},
+  	url = {https://www.sciencedirect.com/science/article/pii/S2352711026002840},
+  	author = {Diego Camarmas-Alonso and Felix Garcia-Carballeira and Alejandro Calderon-Mateos and Elias Del-Pozo-Puñal and Juan Carlos Cano-Resa and Elisa Utrilla-Arroyo}
+  }
+  ```
+</details>
+
+<details>
 <summary>:newspaper: CREATOR-Sail: A RISC-V web simulator based on Sail ISA specification</summary>
 
   * Journal paper: Journal of Systems Architecture
@@ -138,6 +160,22 @@
     keywords = {RISC-V, Sail, Web simulator, Extensible simulator, Instruction set architecture},
   }
   ```
+</details>
+
+<details>
+<summary>:newspaper: CREATOR: A RISC-V web simulator based on Sail specification language</summary>
+
+  * Conference poster: RISC-V Summit Europe
+  * Authors: Juan Carlos Cano-Resa, Félix García-Carballeira, Diego Camarmas-Alonso, Alejandro Calderón-Mateos
+  * [:link: Open publication](https://doi.org/10.13140/RG.2.2.12039.36002)
+</details>
+
+<details>
+<summary>:newspaper: CREATOR: entorno de desarrollo integrado para la docencia y la investigación en arquitecturas RISC-V</summary>
+
+  * Seminar: Jornadas Sarteco
+  * Authors: Félix García-Carballeira, Diego Camarmas-Alonso, Alejandro Calderón-Mateos
+  * [:link: Open publication](https://creatorsim.github.io/content/publications/creator_sarteco_2026.pdf)
 </details>
 
 ### 2025
@@ -554,7 +592,7 @@
   <h2 align="center">Developing CREATOR</h2>
 </div>
 
-See [`docs/dev.md`](https://github.com/creatorsim/creator/blob/master/docs/dev.md).
+See [`CREATOR Wiki - Development Guide`](https://creatorsim.github.io/creator-wiki/development/setup.html).
 
 
 
